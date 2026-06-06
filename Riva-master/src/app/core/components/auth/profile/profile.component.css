@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.profile-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.profile-input {
+  width: 100%;
+  min-height: 4.5rem;
+  border: 1px solid #dde7f3;
+  border-radius: 1.25rem;
+  background: #f9fbfe;
+  padding: 0.95rem 1.6rem;
+  color: #13264a;
+  font-size: 1rem;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.profile-input:focus {
+  border-color: #93c5fd;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+}
+
+.profile-input:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.profile-error {
+  margin-top: 0.45rem;
+  color: #ef4444;
+  font-size: 0.78rem;
+  font-weight: 700;
+}

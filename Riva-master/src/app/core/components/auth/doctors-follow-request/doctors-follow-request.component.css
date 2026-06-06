@@ -1,0 +1,25 @@
+/* تأثير التحرك البطيء للـ Blobs */
+
+@keyframes bounce {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-20px, -30px);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 10s ease-in-out infinite;
+}
+
+
+/* تعديل عرض الحدود لمحاكاة التصميم الأصلي */
+
+
+/* غير الاسم من .border-1.5 إلى .border-1-5 */
+
+.border-1-5 {
+    border-width: 1.5px;
+}

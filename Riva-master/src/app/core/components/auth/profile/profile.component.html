@@ -1,0 +1,197 @@
+<div class="min-h-screen bg-[#f5f8fc] text-slate-900">
+  <app-sidebar></app-sidebar>
+
+  <main class="px-4 py-8 md:ml-20 md:px-10 lg:px-16">
+    <section class="mx-auto max-w-5xl">
+      <div *ngIf="successMessage" class="mb-5 rounded-2xl border border-green-100 bg-green-50 px-5 py-3 text-sm font-semibold text-green-700">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="mb-5 rounded-2xl border border-red-100 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="loading" class="grid min-h-[50vh] place-items-center">
+        <div class="h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"></div>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading" class="space-y-9">
+        <section class="rounded-[28px] border border-blue-50 bg-white p-8 shadow-sm">
+          <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <div class="relative h-28 w-28 shrink-0 rounded-full border-4 border-blue-50 bg-blue-50 p-1 shadow-inner">
+                <img *ngIf="showImage" [src]="imagePreview" (error)="onImageError()" alt="Profile" class="h-full w-full rounded-full object-cover">
+                <div *ngIf="!showImage" class="grid h-full w-full place-items-center rounded-full bg-gradient-to-br from-blue-100 to-cyan-50 text-3xl font-black text-blue-700">
+                  {{ initials }}
+                </div>
+                <label class="absolute -bottom-1 -right-1 grid h-11 w-11 cursor-pointer place-items-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700" title="Upload profile image">
+                  <i class="fa-solid fa-camera"></i>
+                  <input type="file" (change)="onImageSelected($event)" accept="image/*" class="hidden">
+                </label>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-3">
+                  <h1 class="text-2xl font-black text-[#102a56]">{{ displayName }}</h1>
+                  <span class="rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-black tracking-widest text-blue-700">{{ roleLabel }}</span>
+                </div>
+                <p class="mt-2 text-base font-medium text-slate-500">{{ profileForm.get('email')?.value }}</p>
+                <p class="mt-1 text-xs font-semibold text-slate-400">PNG or JPG, up to 2MB</p>
+              </div>
+            </div>
+            <button type="button" (click)="removeImage()" class="rounded-2xl border border-red-100 px-6 py-3 text-sm font-black text-red-500 transition hover:bg-red-50">
+              Remove
+            </button>
+          </div>
+        </section>
+
+        <div class="flex rounded-3xl bg-white/60 p-2 shadow-sm ring-1 ring-blue-50 sm:w-max">
+          <button type="button" (click)="activeProfileTab = 'personal'" class="flex items-center gap-2 rounded-2xl px-8 py-4 text-sm font-black transition"
+            [ngClass]="activeProfileTab === 'personal' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:bg-white/60'">
+            <i class="fa-solid fa-user-gear"></i>
+            Personal
+          </button>
+          <button type="button" (click)="activeProfileTab = 'medical'" class="flex items-center gap-2 rounded-2xl px-8 py-4 text-sm font-black transition"
+            [ngClass]="activeProfileTab === 'medical' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:bg-white/60'">
+            <i class="fa-solid fa-stethoscope"></i>
+            Medical
+          </button>
+        </div>
+
+        <section *ngIf="activeProfileTab === 'personal'" class="rounded-[32px] border border-blue-50 bg-white p-8 shadow-sm md:p-10">
+          <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-lg font-black uppercase tracking-[0.18em] text-[#102a56]">General Information</h2>
+            <span class="h-1 w-16 rounded-full bg-blue-100"></span>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <label class="block">
+              <span class="profile-label">First Name</span>
+              <input formControlName="first_name" class="profile-input" [ngClass]="{'border-red-300': isFieldInvalid('first_name')}">
+              <p *ngIf="isFieldInvalid('first_name')" class="profile-error">{{ getFieldError('first_name') }}</p>
+            </label>
+            <label class="block">
+              <span class="profile-label">Last Name</span>
+              <input formControlName="last_name" class="profile-input" [ngClass]="{'border-red-300': isFieldInvalid('last_name')}">
+              <p *ngIf="isFieldInvalid('last_name')" class="profile-error">{{ getFieldError('last_name') }}</p>
+            </label>
+            <label class="block md:col-span-2">
+              <span class="profile-label">Contact Email</span>
+              <input formControlName="email" class="profile-input text-slate-400">
+            </label>
+            <label class="block">
+              <span class="profile-label">Phone Number</span>
+              <input formControlName="phone" class="profile-input" [ngClass]="{'border-red-300': isFieldInvalid('phone')}">
+              <p *ngIf="isFieldInvalid('phone')" class="profile-error">{{ getFieldError('phone') }}</p>
+            </label>
+            <label class="block md:col-span-2">
+              <span class="profile-label">Home Address</span>
+              <input formControlName="address" class="profile-input" [ngClass]="{'border-red-300': isFieldInvalid('address')}">
+              <p *ngIf="isFieldInvalid('address')" class="profile-error">{{ getFieldError('address') }}</p>
+            </label>
+            <label class="block md:col-span-2">
+              <span class="profile-label">About / Description</span>
+              <textarea formControlName="about" rows="4" class="profile-input resize-none"></textarea>
+            </label>
+          </div>
+
+          <button type="submit" [disabled]="submitting || loading" class="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-5 text-base font-black text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:opacity-60">
+            <i *ngIf="!submitting" class="fa-solid fa-circle-check"></i>
+            <i *ngIf="submitting" class="fa-solid fa-circle-notch fa-spin"></i>
+            {{ submitting ? 'Saving Profile' : 'Update Personal Information' }}
+          </button>
+        </section>
+
+        <section *ngIf="activeProfileTab === 'medical'" class="rounded-[32px] border border-blue-50 bg-white p-8 shadow-sm md:p-10">
+          <div class="mb-8 flex items-center gap-4">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-red-50 text-red-500">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-black uppercase tracking-[0.18em] text-[#102a56]">Medical Records</h2>
+              <p class="text-sm font-medium text-slate-400">Keep your health data updated for better diagnosis</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <label *ngIf="showPatientFields" class="block">
+              <span class="profile-label">Gender</span>
+              <select formControlName="gender" class="profile-input">
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label *ngIf="showPatientFields" class="block">
+              <span class="profile-label">Current Age</span>
+              <input type="number" formControlName="age" class="profile-input">
+            </label>
+            <label *ngIf="showPatientFields" class="block">
+              <span class="profile-label">Blood Type</span>
+              <select formControlName="blood_type" class="profile-input">
+                <option value="">Select blood type</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </label>
+            <label *ngIf="showPatientFields" class="block">
+              <span class="profile-label">Emergency Contact</span>
+              <input formControlName="emergency_contact" class="profile-input">
+            </label>
+            <label *ngIf="showPatientFields" class="block">
+              <span class="profile-label">Chronic Conditions</span>
+              <input formControlName="chronic_conditions" class="profile-input">
+            </label>
+            <label *ngIf="showDoctorFields || showCaregiverFields" class="block">
+              <span class="profile-label">Specialty</span>
+              <input formControlName="specialty" class="profile-input">
+            </label>
+            <label *ngIf="showDoctorFields" class="block">
+              <span class="profile-label">Years of Experience</span>
+              <input type="number" formControlName="years_of_experience" class="profile-input">
+            </label>
+            <label *ngIf="showCaregiverFields" class="block">
+              <span class="profile-label">Years of Experience</span>
+              <input type="number" formControlName="experience_years" class="profile-input">
+            </label>
+            <label *ngIf="showDoctorFields" class="block">
+              <span class="profile-label">Consultation Fee</span>
+              <input type="number" formControlName="fee" class="profile-input">
+            </label>
+            <label *ngIf="showCaregiverFields" class="block">
+              <span class="profile-label">Salary Expectation</span>
+              <input type="number" formControlName="salary" class="profile-input">
+            </label>
+            <label *ngIf="showDoctorFields" class="block">
+              <span class="profile-label">License Number</span>
+              <input formControlName="license_number" class="profile-input">
+            </label>
+            <label *ngIf="showPatientFields" class="block md:col-span-2">
+              <span class="profile-label">Medical History</span>
+              <textarea formControlName="medical_history" rows="4" class="profile-input resize-none"></textarea>
+            </label>
+            <label *ngIf="showDoctorFields || showCaregiverFields" class="block md:col-span-2">
+              <span class="profile-label">Bio</span>
+              <textarea formControlName="bio" rows="4" class="profile-input resize-none"></textarea>
+            </label>
+            <label *ngIf="showDoctorFields" class="block md:col-span-2">
+              <span class="profile-label">Available Days</span>
+              <input formControlName="available_days" class="profile-input">
+            </label>
+          </div>
+
+          <button type="submit" [disabled]="submitting || loading" class="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-5 text-base font-black text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:opacity-60">
+            <i *ngIf="!submitting" class="fa-solid fa-floppy-disk"></i>
+            <i *ngIf="submitting" class="fa-solid fa-circle-notch fa-spin"></i>
+            Save Medical History
+          </button>
+        </section>
+      </form>
+    </section>
+  </main>
+</div>

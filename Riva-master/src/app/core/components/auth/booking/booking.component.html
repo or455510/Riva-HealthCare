@@ -1,0 +1,380 @@
+<app-sidebar></app-sidebar>
+<aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+    <div class="text-blue-600 font-bold text-xl">
+        <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12">
+    </div>
+    <div class="flex flex-col gap-6 text-gray-400">
+        <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/dashboard-p"><i class="fas fa-home"></i></button>
+        <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/add-new-medication"><i class="fas fa-pills"></i></button>
+        <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/doctor-cards"><i class="fa-solid fa-user-doctor"></i></button>
+        <button class="p-2 hover:text-blue-600" routerLink="/chat"><i class="fa-brands fa-rocketchat"></i></button>
+        <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/myprofile"><i class="fa-solid fa-circle-user"></i></button>
+    </div>
+</aside>
+
+<!-- ══════════════ STEP 1 ══════════════ -->
+<main *ngIf="currentStep() === 1" class="min-h-screen bg-slate-50 md:pl-20 pb-12 font-sans">
+    <div class="max-w-[1100px] mx-auto px-5 py-10">
+
+        <!-- Title — يتغير حسب mode -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-2">
+                Book a
+                <em class="not-italic" [ngClass]="isCaregiver ? 'text-purple-600' : 'text-blue-600'">
+          {{ isCaregiver ? 'caregiver' : 'consultation' }}
+        </em>
+            </h1>
+            <p class="text-slate-500">Complete the following steps to confirm your appointment</p>
+        </div>
+        <div *ngIf="errorMessage()" class="max-w-2xl mx-auto mb-5 bg-red-50 border border-red-100 text-red-600 rounded-2xl px-5 py-3 text-sm font-semibold">
+            {{ errorMessage() }}
+        </div>
+        <div *ngIf="successMessage()" class="max-w-2xl mx-auto mb-5 bg-green-50 border border-green-100 text-green-700 rounded-2xl px-5 py-3 text-sm font-semibold">
+            {{ successMessage() }}
+        </div>
+
+        <!-- Steps indicator -->
+        <div class="flex items-center justify-center mb-12 max-w-[600px] mx-auto">
+            <div class="flex flex-col items-center gap-2 relative z-10">
+                <div [class]="isStepDone(1) ? 'bg-blue-600 text-white' : (isStepActive(1) ? 'border-blue-600 text-blue-600 ring-4 ring-blue-50' : 'border-gray-200 text-gray-400')" class="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center font-semibold transition-all">
+                    <ng-container *ngIf="isStepDone(1); else num1">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </ng-container>
+                    <ng-template #num1><span>1</span></ng-template>
+                </div>
+                <div class="text-xs font-bold" [class.text-blue-600]="isStepActive(1)">
+                    {{ isCaregiver ? 'Care type' : 'Appointment' }}
+                </div>
+            </div>
+            <div class="flex-1 h-[2px] bg-gray-200 mx-3 mb-6"></div>
+            <div class="flex flex-col items-center gap-2 relative z-10">
+                <div [class]="isStepDone(2) ? 'bg-blue-600 text-white' : (isStepActive(2) ? 'border-blue-600 text-blue-600 ring-4 ring-blue-50' : 'border-gray-200 text-gray-400')" class="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center font-semibold transition-all">
+                    <span>2</span>
+                </div>
+                <div class="text-xs font-medium text-gray-400">Payment</div>
+            </div>
+            <div class="flex-1 h-[2px] bg-gray-200 mx-3 mb-6"></div>
+            <div class="flex flex-col items-center gap-2 relative z-10">
+                <div [class]="isStepActive(3) ? 'border-blue-600 text-blue-600' : 'border-gray-200 text-gray-400'" class="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center font-semibold transition-all">
+                    <span>3</span>
+                </div>
+                <div class="text-xs font-medium text-gray-400">Confirm</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 items-start">
+            <div class="space-y-6">
+
+                <!-- Care / Consultation Type -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <label class="block text-base font-bold mb-5">
+            {{ isCaregiver ? 'Care type' : 'Consultation type' }}
+          </label>
+                    <div *ngFor="let opt of consultOptions" (click)="selectedConsultType.set(opt.id)" [class.border-purple-500]="isCaregiver && selectedConsultType() === opt.id" [class.bg-purple-50]="isCaregiver && selectedConsultType() === opt.id" [class.border-blue-600]="!isCaregiver && selectedConsultType() === opt.id"
+                        [class.bg-blue-50]="!isCaregiver && selectedConsultType() === opt.id" class="flex justify-between items-center p-4 border-2 border-gray-100 rounded-xl mb-3 cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-800">{{ opt.label }}</div>
+                            <div class="text-xs text-slate-500">Duration: {{ opt.duration }}</div>
+                        </div>
+                        <div class="text-xl font-extrabold" [ngClass]="isCaregiver ? 'text-purple-600' : 'text-blue-600'">
+                            {{ opt.price }} <span class="text-xs">EGP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <label class="block text-base font-bold mb-5">
+            {{ isCaregiver ? 'Start date' : 'Appointment date' }}
+          </label>
+                    <div class="select-none">
+                        <div class="flex justify-between items-center mb-5">
+                            <button class="p-2 border border-gray-200 rounded-lg hover:bg-gray-50" (click)="prevMonth()">←</button>
+                            <div class="font-bold text-lg">{{ calMonthTitle() }}</div>
+                            <button class="p-2 border border-gray-200 rounded-lg hover:bg-gray-50" (click)="nextMonth()">→</button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center">
+                            <div *ngFor="let d of DAY_NAMES" class="text-xs text-gray-400 font-bold pb-2">{{ d }}</div>
+                            <button *ngFor="let cell of calendarCells()" (click)="selectDay(cell.day, cell.state)" [disabled]="cell.state === 'disabled' || cell.state === 'empty'" [ngClass]="{
+                  'bg-blue-600 text-white shadow-md':    !isCaregiver && cell.state === 'selected',
+                  'bg-purple-600 text-white shadow-md':  isCaregiver  && cell.state === 'selected',
+                  'text-blue-600 font-bold underline':   cell.state === 'today',
+                  'text-gray-200 cursor-not-allowed':    cell.state === 'disabled',
+                  'hover:bg-blue-50 hover:text-blue-600': !isCaregiver && cell.state !== 'disabled' && cell.state !== 'selected',
+                  'hover:bg-purple-50 hover:text-purple-600': isCaregiver && cell.state !== 'disabled' && cell.state !== 'selected'
+                }" class="aspect-square flex items-center justify-center rounded-xl transition-all font-medium">
+                {{ cell.day }}
+              </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Slots (للـ caregiver نغير الـ label) -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-5">
+                        <span class="text-base font-bold">
+              {{ isCaregiver ? 'Preferred start time' : 'Available time slots' }}
+            </span>
+                        <span class="text-sm font-medium" [ngClass]="isCaregiver ? 'text-purple-600' : 'text-blue-600'">
+              {{ selectedDateLabel() }}
+            </span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                        <button *ngFor="let slot of timeSlots" (click)="selectSlot(slot)" [disabled]="slot.disabled" [class.bg-blue-600]="!isCaregiver && selectedSlot() === slot.time" [class.bg-purple-600]="isCaregiver && selectedSlot() === slot.time" [class.text-white]="selectedSlot() === slot.time"
+                            [class.border-blue-600]="!isCaregiver && selectedSlot() === slot.time" [class.border-purple-600]="isCaregiver && selectedSlot() === slot.time" class="p-3 border border-gray-200 rounded-xl font-semibold transition-all disabled:bg-slate-50 disabled:text-slate-300 disabled:border-dashed hover:border-blue-600 hover:text-blue-600">
+              {{ slot.time }}
+            </button>
+                    </div>
+                </div>
+
+                <!-- Notes + File -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <label class="block text-base font-bold mb-5">Additional details</label>
+                    <textarea class="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl mb-4 focus:ring-2 focus:border-transparent outline-none transition-all" [ngClass]="isCaregiver ? 'focus:ring-purple-500' : 'focus:ring-blue-500'" [placeholder]="isCaregiver ? 'Describe care needs, patient condition...' : 'Describe symptoms...'"
+                        [ngModel]="notes()" (ngModelChange)="notes.set($event)">
+          </textarea>
+                    <div (click)="triggerFileInput()" class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center text-gray-400 cursor-pointer transition-all" [ngClass]="isCaregiver ? 'hover:border-purple-500 hover:bg-purple-50' : 'hover:border-blue-600 hover:bg-blue-50'">
+                        <p>Click to upload or drag & drop</p>
+                        <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+                    </div>
+                    <div class="mt-3 p-3 bg-slate-100 rounded-lg flex justify-between items-center text-sm" *ngIf="attachedFileName()">
+                        <span>📎 {{ attachedFileName() }}</span>
+                        <button (click)="removeFile()" class="text-red-500 font-bold">✕</button>
+                    </div>
+                </div>
+
+                <!-- Next Step Button -->
+                <button [disabled]="isSubmittingBooking()" class="w-full text-white py-4 rounded-xl text-lg font-bold shadow-lg transition-transform active:scale-[0.98] disabled:opacity-60" [ngClass]="isCaregiver
+            ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-200'
+            : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'" (click)="nextStep()">
+          {{ isSubmittingBooking() ? 'Booking...' : 'Next step' }}
+        </button>
+            </div>
+
+            <!-- ══ Person Card (Doctor or Caregiver) ══ -->
+
+            <!-- Doctor Card -->
+            <aside *ngIf="isDoctor" class="lg:sticky lg:top-10 bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 rounded-[32px] shadow-xl">
+                <div class="flex items-center gap-4 mb-5">
+                    <img [src]="personAvatar" [alt]="personName" class="w-16 h-16 rounded-2xl object-cover border-2 border-white/30">
+                    <div>
+                        <div class="text-xl font-bold">Dr. {{ personName }}</div>
+                        <div class="text-blue-100 text-xs uppercase tracking-wider font-semibold mt-0.5">{{ personSpecialty }}</div>
+                    </div>
+                </div>
+                <div class="h-px bg-white/20 mb-5"></div>
+                <p class="text-blue-50 leading-relaxed opacity-90 italic text-sm mb-5" *ngIf="personBio">"{{ personBio }}"</p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl" *ngIf="doctorFee">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Consultation Fee: <strong>{{ doctorFee }} EGP</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl" *ngIf="personExperience">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Experience: <strong>{{ personExperience }} years</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl" *ngIf="doctorAvailableDays.length > 0">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Available: <strong>{{ doctorAvailableDays.join(', ') }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl">
+                        <i class="fas fa-check-circle"></i><span>Professional Care</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl">
+                        <i class="fas fa-clock"></i><span>On-time Appointments</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Caregiver Card -->
+            <aside *ngIf="isCaregiver" class="lg:sticky lg:top-10 bg-gradient-to-br from-purple-600 to-purple-900 text-white p-8 rounded-[32px] shadow-xl">
+                <div class="flex items-center gap-4 mb-5">
+                    <img [src]="personAvatar" [alt]="personName" class="w-16 h-16 rounded-2xl object-cover border-2 border-white/30">
+                    <div>
+                        <div class="text-xl font-bold">{{ personName }}</div>
+                        <div class="text-purple-200 text-xs uppercase tracking-wider font-semibold mt-0.5">{{ personSpecialty }}</div>
+                    </div>
+                </div>
+                <div class="h-px bg-white/20 mb-5"></div>
+                <p class="text-purple-100 leading-relaxed opacity-90 italic text-sm mb-5" *ngIf="personBio">"{{ personBio }}"</p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl" *ngIf="caregiverSalary">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Monthly Salary: <strong>{{ caregiverSalary }} EGP</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl">
+                        <i class="fas fa-money-bill-alt"></i>
+                        <span>Daily rate: <strong>{{ consultOptions[0]?.price }} EGP</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl" *ngIf="personExperience">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Experience: <strong>{{ personExperience }} years</strong></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl">
+                        <i class="fas fa-heart"></i><span>Compassionate Care</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm bg-white/10 p-3 rounded-xl">
+                        <i class="fas fa-home"></i><span>Home Visits Available</span>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</main>
+
+<!-- ══════════════ STEP 2 — NEW PAYMENT DESIGN ══════════════ -->
+<main *ngIf="currentStep() === 2" class="min-h-screen bg-slate-100 md:pl-20 pb-12 font-sans">
+    <div class="max-w-[980px] mx-auto px-5 py-10">
+
+        <!-- Alerts -->
+        <div *ngIf="errorMessage()" class="mb-6 bg-red-50 border border-red-100 text-red-600 rounded-2xl px-5 py-3 text-sm font-semibold">
+            {{ errorMessage() }}
+        </div>
+        <div *ngIf="successMessage()" class="mb-6 bg-green-50 border border-green-100 text-green-700 rounded-2xl px-5 py-3 text-sm font-semibold">
+            {{ successMessage() }}
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-[1fr_360px] items-start">
+
+            <!-- ── Left: Payment Form ── -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-8">
+
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900">Payment method</h2>
+                    <p class="text-sm text-slate-400 mt-1">Choose cash for demo confirmation or enter card details.</p>
+                </div>
+
+                <!-- Method selector -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" (click)="setPaymentMethod('cash')" class="flex flex-col gap-3 p-5 rounded-2xl border-2 text-left transition-all" [ngClass]="paymentMethod() === 'cash'
+              ? 'border-blue-600 bg-blue-50'
+              : 'border-slate-200 hover:border-blue-300 bg-white'">
+            <span class="w-10 h-10 rounded-xl flex items-center justify-center"
+              [ngClass]="paymentMethod() === 'cash' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'">
+              <i class="fas fa-money-bill-wave text-lg"></i>
+            </span>
+            <span>
+              <span class="block text-sm font-black text-slate-800">Cash / Demo Pay</span>
+              <span class="text-xs text-slate-400">Confirm instantly in local testing</span>
+            </span>
+          </button>
+
+                    <button type="button" (click)="setPaymentMethod('card')" class="flex flex-col gap-3 p-5 rounded-2xl border-2 text-left transition-all" [ngClass]="paymentMethod() === 'card'
+              ? 'border-blue-600 bg-blue-50'
+              : 'border-slate-200 hover:border-blue-300 bg-white'">
+            <span class="w-10 h-10 rounded-xl flex items-center justify-center"
+              [ngClass]="paymentMethod() === 'card' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'">
+              <i class="fas fa-credit-card text-lg"></i>
+            </span>
+            <span>
+              <span class="block text-sm font-black text-slate-800">Card</span>
+              <span class="text-xs text-slate-400">Validate fields before payment</span>
+            </span>
+          </button>
+                </div>
+
+                <!-- Card fields -->
+                <div *ngIf="showCardFields()" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Cardholder name</label>
+                        <input [ngModel]="cardName()" (ngModelChange)="cardName.set($event)" placeholder="John Smith" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Card number</label>
+                        <div class="relative">
+                            <input [ngModel]="cardNumber()" (input)="formatCardNumber($event)" placeholder="1234 1234 1234 1234" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all pr-16">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-blue-600 tracking-wider">VISA</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Expiry</label>
+                            <input [ngModel]="cardExpiry()" (input)="formatExpiry($event)" placeholder="MM / YY" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">CVV</label>
+                            <input [ngModel]="cardCvv()" (ngModelChange)="cardCvv.set($event)" placeholder="CVC" maxlength="4" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <button type="button" (click)="prevStep()" class="flex items-center gap-2 px-6 py-3 rounded-2xl border border-slate-200 text-slate-500 text-sm font-black hover:bg-slate-50 transition-all">
+            <i class="fas fa-arrow-left text-xs"></i> Back
+          </button>
+                    <button type="button" (click)="markPaymentFailed()" [disabled]="isProcessingPayment()" class="px-6 py-3 rounded-2xl text-red-500 text-sm font-black hover:underline disabled:opacity-60 transition-all">
+            Simulate failed payment
+          </button>
+                    <button type="button" (click)="completePayment()" [disabled]="isProcessingPayment()" class="ml-auto flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-blue-600 text-white text-sm font-black hover:bg-blue-700 disabled:opacity-60 transition-all shadow-lg shadow-blue-200">
+            <i class="fas fa-lock text-xs"></i>
+            {{ isProcessingPayment() ? 'Processing...' : 'Pay & confirm appointment' }}
+          </button>
+                </div>
+            </div>
+
+            <!-- ── Right: Summary Card (dark blue) ── -->
+            <aside class="rounded-3xl overflow-hidden shadow-xl" style="background: #1040a0;">
+
+                <!-- Header -->
+                <div class="px-8 pt-8 pb-6" style="background: #1040a0;">
+                    <p class="text-xs font-black uppercase tracking-widest mb-5" style="color: rgba(255,255,255,0.6);">
+                        <i class="fas fa-arrow-right mr-2"></i>Appointment summary
+                    </p>
+                    <p class="text-sm mb-1" style="color: rgba(255,255,255,0.6);">Total Due Amount</p>
+                    <p class="text-5xl font-black text-white">{{ summaryPrice() }}</p>
+                </div>
+
+                <!-- Details rows -->
+                <div class="px-8 pb-6 space-y-0" style="background: #1040a0;">
+                    <div class="flex justify-between items-center py-4" style="border-bottom: 1px solid rgba(255,255,255,0.12);">
+                        <span class="text-sm" style="color: rgba(255,255,255,0.6);">Provider</span>
+                        <span class="text-sm font-black text-white">{{ personName }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-4" style="border-bottom: 1px solid rgba(255,255,255,0.12);">
+                        <span class="text-sm" style="color: rgba(255,255,255,0.6);">Date</span>
+                        <span class="text-sm font-black text-white">{{ summaryDate() }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-4" style="border-bottom: 1px solid rgba(255,255,255,0.12);">
+                        <span class="text-sm" style="color: rgba(255,255,255,0.6);">Time</span>
+                        <span class="text-sm font-black text-white">{{ summaryTime() }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-4">
+                        <span class="text-sm" style="color: rgba(255,255,255,0.6);">Type</span>
+                        <span class="text-sm font-black text-white">{{ summaryType() }}</span>
+                    </div>
+                </div>
+
+                <!-- Status notice -->
+                <div class="mx-6 mb-6 rounded-2xl px-5 py-4 text-sm font-semibold" style="background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);">
+                    Status: pending payment. The doctor is notified after payment succeeds.
+                </div>
+
+                <!-- Footer -->
+                <div class="px-8 pb-8 flex justify-between items-center text-xs" style="color: rgba(255,255,255,0.4);">
+                    <span>© 2026 Secure Checkout</span>
+                    <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> Live system
+                    </span>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</main>
+
+<!-- ══════════════ STEP 3 ══════════════ -->
+<main *ngIf="currentStep() === 3" class="min-h-screen bg-slate-50 md:pl-20 grid place-items-center p-6 font-sans">
+    <section class="max-w-xl w-full bg-white rounded-[32px] border border-green-100 shadow-sm p-10 text-center">
+        <div class="mx-auto w-20 h-20 rounded-3xl bg-green-50 text-green-600 grid place-items-center text-3xl mb-6">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <p class="text-xs font-black uppercase tracking-widest text-green-600">Payment successful</p>
+        <h1 class="text-3xl font-black text-slate-900 mt-2">Appointment confirmed</h1>
+        <p class="text-slate-500 mt-4">Your payment was completed. The doctor has been notified and the appointment is now confirmed.</p>
+        <button type="button" routerLink="/dashboard-p" class="mt-8 px-8 py-4 rounded-2xl bg-blue-600 text-white text-sm font-black hover:bg-blue-700">
+            Go to dashboard
+        </button>
+    </section>
+</main>

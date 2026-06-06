@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-slate-50 font-sans pb-24 md:pb-8 md:pl-20" dir="ltr">
+    <app-sidebar></app-sidebar>
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <!-- <aside class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <img src="/Picture1.png" routerLink="/dashboard-p" class="w-12">
+        <div class="flex flex-col gap-6 text-gray-400">
+
+            <button class="p-2 hover:text-purple-600" routerLink="/dashboard-caregiver">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="p-2 hover:text-purple-600" routerLink="/chat-c">
+         <i class="fa-brands fa-rocketchat"></i>
+            </button>
+            <button class="p-2 hover:text-purple-600" routerLink="/myprofile">
+                <i class="fa-solid fa-circle-user"></i>
+            </button>
+            <button class="p-2 hover:text-blue-600" routerLink="/contact"><i class="fa-solid fa-phone"></i></button>
+            <button class="p-2 bg-purple-50 text-purple-600 rounded-lg" routerLink="/patient-cards"><i class="fa-solid fa-bed-pulse"></i></button>
+
+
+        </div>
+    </aside> -->
+    <aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div>
+            <img src="/Picture1.png" [routerLink]="isDoctor ? '/dashboard' : isCaregiver ? '/dashboard-caregiver' : '/dashboard-p'" class="w-12 hover:scale-105 cursor-pointer">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button *ngFor="let item of sidebarLinks" class="p-2 transition-colors" routerLinkActive="bg-purple-50 text-blue-600 rounded-lg" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="item.route">
+  <i [ngClass]="item.icon"></i>
+</button>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="p-6 md:p-10 bg-gradient-to-br from-white to-[#F9FBFF] min-h-screen">
+
+        <!-- TITLE -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-black text-slate-800">
+                Choose who will follow your <span class="text-[#00D1B2]">health</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-3">
+                You can change this later at any time
+            </p>
+        </div>
+
+        <!-- ===================== LOADING ===================== -->
+        <div *ngIf="isLoading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div *ngFor="let i of [1,2,3,4]" class="bg-white p-6 rounded-[2.5rem] animate-pulse">
+                <div class="w-20 h-20 bg-slate-200 rounded-2xl mb-4"></div>
+                <div class="h-4 bg-slate-200 w-32 mb-2"></div>
+                <div class="h-3 bg-slate-100 w-24 mb-3"></div>
+                <div class="h-3 bg-slate-100 w-full mb-2"></div>
+                <div class="h-10 bg-slate-200 rounded-xl"></div>
+            </div>
+        </div>
+
+        <!-- ===================== ERROR ===================== -->
+        <div *ngIf="!isLoading && errorMessage" class="text-center py-20">
+            <p class="text-red-400 font-semibold">{{ errorMessage }}</p>
+            <button (click)="loadPatients()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-xl">
+        Try Again
+      </button>
+        </div>
+
+        <!-- ===================== EMPTY ===================== -->
+        <div *ngIf="!isLoading && !errorMessage && patients.length === 0" class="text-center py-20">
+            <i class="fa-solid fa-user-doctor text-5xl text-slate-200"></i>
+            <p class="text-slate-400 mt-4">No patients available</p>
+        </div>
+
+        <!-- ===================== GRID ===================== -->
+        <div *ngIf="!isLoading && patients.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div *ngFor="let p of patients" class="bg-white p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl transition flex flex-col items-center text-center">
+
+                <!-- IMAGE -->
+                <div class="relative mb-4">
+                    <img [src]="getAvatar(p)" class="w-20 h-20 rounded-2xl object-cover">
+
+                    <span *ngIf="getRating(p)" class="absolute -top-1 -right-1 bg-yellow-400 text-[10px] font-black px-2 py-0.5 rounded-full">
+            ★ {{ getRating(p) }}
+          </span>
+                </div>
+
+                <!-- NAME -->
+                <h3 class="font-bold text-slate-800">
+                    {{ getName(p) }}
+                </h3>
+
+                <!-- SPECIALTY -->
+                <p class="text-[10px] text-blue-500 font-black uppercase mt-1 mb-3">
+                    {{ getSpecialty(p) }}
+                </p>
+
+                <!-- BIO -->
+                <p class="text-xs text-slate-500 line-clamp-2 mb-6">
+                    {{ getBio(p) }}
+                </p>
+
+                <!-- BUTTON -->
+                <button (click)="selectPatient(p)" class="w-full bg-[#0052FF] text-white py-3 rounded-xl text-[11px] font-black uppercase">
+          Select
+        </button>
+
+            </div>
+        </div>
+
+    </main>
+</div>

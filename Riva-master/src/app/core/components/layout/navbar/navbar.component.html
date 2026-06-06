@@ -1,0 +1,58 @@
+<nav class="bg-white/80 backdrop-blur-md fixed w-full z-50 top-0 inset-x-0 border-b border-gray-100 transition-all duration-300 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+
+        <!-- Logo (تم تكبيره هنا) -->
+        <a [routerLink]="['home']" class="flex items-center gap-2 group transform hover:scale-102 transition-transform duration-200">
+            <img src="/Picture1.png" class="h-17 w-auto object-contain min-w-[110px]" alt="Riva Logo">
+        </a>
+
+        <!-- Nav Links (Center) -->
+        <div class="hidden md:flex items-center gap-8" id="navbar-sticky">
+            <a [routerLink]="['home']" routerLinkActive="text-sky-500 font-medium scale-105" class="relative text-sm text-gray-600 hover:text-sky-500 font-medium transition-all duration-200 group py-2">
+                Home
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sky-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+
+            <a (click)="scrollToSection('about')" class="relative text-sm text-gray-600 hover:text-sky-500 font-medium transition-all duration-200 cursor-pointer group py-2">
+                About
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sky-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+
+            <a (click)="scrollToSection('features')" class="relative text-sm text-gray-600 hover:text-sky-500 font-medium transition-all duration-200 cursor-pointer group py-2">
+                Features
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sky-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+
+            <a (click)="scrollToSection('reviews')" class="relative text-sm text-gray-600 hover:text-sky-500 font-medium transition-all duration-200 cursor-pointer group py-2">
+                Reviews
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sky-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+
+            <a [routerLink]="['contact']" routerLinkActive="text-sky-500 font-medium scale-105" class="relative text-sm text-gray-600 hover:text-sky-500 font-medium transition-all duration-200 group py-2">
+                Contact Us
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sky-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center gap-4">
+            <!-- Sign In -->
+            <a href="/signin" class="text-sm font-semibold text-gray-700 hover:text-sky-500 px-4 py-2 rounded-xl hover:bg-sky-50/50 transition-all duration-200">
+                Sign In
+            </a>
+
+            <!-- Create Account -->
+            <a href="/signup" class="text-sm font-medium text-white px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 shadow-md shadow-sky-100 hover:shadow-lg hover:shadow-sky-200 hover:-translate-y-0.5 transition-all duration-200">
+                Create Account
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button data-collapse-toggle="navbar-sticky" type="button" class="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100/80 active:scale-95 transition-all">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+</nav>

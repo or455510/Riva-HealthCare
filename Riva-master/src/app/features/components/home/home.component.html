@@ -1,0 +1,467 @@
+<section>
+
+    <!-- ══════════════════════ HERO ══════════════════════ -->
+    <div class="relative w-full min-h-125 flex items-center bg-white overflow-hidden font-sans pt-10">
+
+        <div class="absolute right-0 top-0 h-full w-full md:w-1/2 z-0 overflow-hidden">
+            <img src="image/home.jpeg" alt="DNA" class="animate-dna-float object-cover w-full h-full opacity-60 transition-all duration-1000">
+            <div class="absolute inset-0 bg-linear-to-r from-white via-white/20 to-transparent"></div>
+        </div>
+
+        <div class="container mx-auto px-6 md:px-12 z-10">
+            <div class="max-w-2xl">
+
+                <!-- ★ ADD: hero-title -->
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight hero-title">
+                    Riva Platform... <br />
+                    <span class="text-gray-900">Integrated Healthcare Anytime</span>
+                    <span class="text-sky-500 block mt-2">, Anywhere</span>
+                </h1>
+
+                <!-- ★ ADD: hero-para -->
+                <p class="mt-6 text-gray-600 text-lg leading-relaxed max-w-lg hero-para">
+                    Connect with top-tier specialists, track your health metrics, and manage appointments seamlessly through our secure ecosystem.
+                </p>
+            </div>
+
+            <!-- ★ ADD: hero-cta -->
+            <div class="mt-10 flex gap-4 hero-cta">
+
+                <button (click)="goToSignin()" class="px-8 py-3 bg-sky-500 text-white rounded-full shadow-lg hover:bg-sky-600 transition">Get Started</button>
+                <button (click)="goToContact()" class="px-8 py-3 border border-gray-200 rounded-full hover:bg-gray-50">Contact Us</button>
+
+                <div class="flex -space-x-3 items-center ml-4">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar4.jpeg" alt="Rounded avatar">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar2.jpeg" alt="Rounded avatar">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar3.jpeg" alt="Rounded avatar">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+        @keyframes dnaFloat {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) rotate(3deg) scale(1.07);
+            }
+            100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+        }
+        
+        .animate-dna-float {
+            animation: dnaFloat 9s ease-in-out infinite;
+        }
+    </style>
+
+
+    <!-- ══════════════════════ MARQUEE ══════════════════════ -->
+    <div class="relative font-sans py-10 overflow-hidden">
+        <div class="flex whitespace-nowrap overflow-hidden">
+            <!-- Marquee hover is handled by JS in ngAfterViewInit -->
+            <div class="flex animate-marquee gap-8 items-center">
+                <img src="image/slide1.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 1">
+                <img src="image/slide2.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 2">
+                <img src="image/slide3.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 3">
+                <img src="image/slide4.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 4">
+                <img src="image/slide5.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 5">
+                <img src="image/slide6.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 6">
+                <img src="image/slide7.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 7">
+                <img src="image/slide8.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 8">
+                <img src="image/slide9.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 9">
+                <img src="image/slide10.jpeg" class="h-70 w-140 object-contain transition" alt="Brand 10">
+            </div>
+        </div>
+        <div class="absolute inset-y-0 left-0 w-20 bg-linear-to-r from-gray-50 to-transparent z-10"></div>
+        <div class="absolute inset-y-0 right-0 w-20 bg-linear-to-l from-gray-50 to-transparent z-10"></div>
+    </div>
+
+    <style>
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+
+
+    <!-- ══════════════════════ ABOUT ══════════════════════ -->
+    <div id="about" class="relative bg-white py-20 overflow-hidden font-sans">
+
+        <!-- ★ ADD: section-heading reveal -->
+        <div class="text-center mb-16 section-heading reveal">
+            <h2 class="text-3xl font-bold text-sky-600">About Us</h2>
+        </div>
+
+        <div class="container mx-auto px-6 about-tabs-layout">
+
+            <!-- Left: feature cards — ADD about-card + reveal-left -->
+            <div class="about-tabs-list z-10">
+                <button
+                    type="button"
+                    class="about-tab-card reveal-left"
+                    *ngFor="let tab of aboutTabs; let i = index"
+                    [class.active]="i === activeAboutIndex"
+                    (click)="selectAboutTab(i)"
+                    [attr.aria-selected]="i === activeAboutIndex"
+                >
+                    <span class="about-tab-icon">
+                        <img [src]="tab.icon" [alt]="tab.shortTitle">
+                    </span>
+                    <span>
+                        <strong>{{ tab.title }}</strong>
+                        <small>{{ tab.shortTitle }}</small>
+                    </span>
+                </button>
+            </div>
+
+            <!-- Right: text + images — ADD about-right-col reveal -->
+            <div class="about-tab-panel about-right-col reveal" [ngClass]="activeAboutTab.animationClass" [attr.data-tab]="activeAboutIndex">
+                <img src="image/home.jpeg" class="about-bg" alt="DNA Background">
+
+                <div class="about-panel-copy">
+                    <span class="about-kicker">Riva Platform</span>
+                    <h3>{{ activeAboutTab.shortTitle }}</h3>
+                    <p>{{ activeAboutTab.description }}</p>
+                </div>
+
+                <div class="about-image-grid">
+                    <div class="about-image-card" *ngFor="let image of activeAboutTab.images; let i = index" [class.featured]="i === 0">
+                        <img [src]="image.src" [alt]="image.alt">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════ HEALTH CONDITIONS ══════════════════════ -->
+    <div id="features" class="bg-gray-50 py-16 px-6 font-sans">
+
+        <div class="text-center mb-12 section-heading reveal">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                Health Conditions We Support
+            </h2>
+
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Riva leverages advanced technology to provide insights and support for various medical conditions.
+            </p>
+        </div>
+
+        <div class="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 stagger-group">
+
+            <!-- Diabetes -->
+            <div (click)="goToDisease('diabetes')" class="group cursor-pointer relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-3 health-card reveal">
+
+                <div class="overflow-hidden rounded-2xl mb-6">
+                    <img src="image/New folder/WhatsApp Image 2026-02-09 at 11.29.57 PM.jpeg" alt="Diabetes" class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2">
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                    Diabetes
+                </h3>
+
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Track sugar levels, insulin doses, and diabetes health insights.
+                </p>
+            </div>
+
+            <!-- Cancer -->
+            <div (click)="goToDisease('cancer')" class="group cursor-pointer relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-3 health-card reveal">
+
+                <div class="overflow-hidden rounded-2xl mb-6">
+                    <img src="image/New folder/WhatsApp Image 2026-02-09 at 11.29.58 PM (1).jpeg" alt="Cancer" class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110">
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                    Cancer
+                </h3>
+
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    AI-powered monitoring and detailed oncology tracking tools.
+                </p>
+            </div>
+
+            <!-- Heart -->
+            <div (click)="goToDisease('heart')" class="group cursor-pointer relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-3 health-card reveal">
+
+                <div class="overflow-hidden rounded-2xl mb-6">
+                    <img src="image/New folder/WhatsApp Image 2026-02-09 at 11.30.20 PM.jpeg" alt="Heart" class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-2">
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                    Heart Disease
+                </h3>
+
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Monitor heart rate, blood flow, and cardiovascular health reports.
+                </p>
+            </div>
+
+            <!-- Hypertension -->
+            <div (click)="goToDisease('hypertension')" class="group cursor-pointer relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-3 health-card reveal">
+
+                <div class="overflow-hidden rounded-2xl mb-6">
+                    <img src="image/New folder/WhatsApp Image 2026-02-23 at 7.01.07 PM.jpeg" alt="Hypertension" class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110">
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                    Hypertension
+                </h3>
+
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Keep track of blood pressure levels and hypertension risks.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════ TESTIMONIALS ══════════════════════ -->
+    <div class="bg-blue-50/30 py-20 px-6 font-sans testimonials-section">
+
+        <!-- ★ ADD: section heading reveal -->
+        <div id="reviews" class="text-center mb-16 section-heading reveal">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">What Our Families Say</h2>
+            <p class="text-gray-500 text-lg">Real stories from real people who trust us with their care</p>
+        </div>
+
+        <div class="container mx-auto testimonial-slider" (mouseenter)="pauseReviews()" (mouseleave)="resumeReviews()">
+            <button class="testimonial-arrow testimonial-prev" type="button" (click)="prevReview()" aria-label="Previous review">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="testimonial-track" [attr.data-slide]="reviewAnimationKey">
+                <article class="review-card" *ngFor="let review of currentTestimonials; let i = index" [class.active]="i === 0">
+                    <div>
+                        <div class="review-stars" aria-label="5 star rating">
+                            <i class="fa-solid fa-star" *ngFor="let star of stars" [class.dimmed]="star > review.rating"></i>
+                        </div>
+                        <p class="review-comment">"{{ review.comment }}"</p>
+                    </div>
+                    <div class="review-person">
+                        <img *ngIf="review.avatar" class="review-avatar" [src]="review.avatar" [alt]="review.name">
+                        <div *ngIf="!review.avatar" class="review-initials">{{ getInitials(review.name) }}</div>
+                        <div>
+                            <h4>{{ review.name }}</h4>
+                            <span>{{ review.role }}</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <button class="testimonial-arrow testimonial-next" type="button" (click)="nextReview()" aria-label="Next review">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <div class="testimonial-dots" role="tablist" aria-label="Review slides">
+                <button *ngFor="let review of reviews; let i = index" type="button" [class.active]="i === currentReviewIndex" (click)="goToReview(i)" [attr.aria-label]="'Go to review ' + (i + 1)"></button>
+            </div>
+        </div>
+
+        <div class="legacy-testimonials" aria-hidden="true">
+
+            <!-- ★ ADD: testimonial-card to each card (observer targets this class) -->
+            <div class="bg-white p-8 rounded-4xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow duration-300 testimonial-card">
+                <div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-8">
+                        "The app is so intuitive. Scheduling appointments takes seconds, and the video quality is excellent."
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar3.jpeg" alt="Rounded avatar">
+                    <div>
+                        <h4 class="font-bold text-gray-900 leading-none">Robert Miller</h4>
+                        <span class="text-gray-400 text-sm italic">Patient</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-4xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow duration-300 testimonial-card">
+                <div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-8">
+                        "The app is so intuitive. Scheduling appointments takes seconds, and the video quality is excellent."
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar2.jpeg" alt="Rounded avatar">
+                    <div>
+                        <h4 class="font-bold text-gray-900 leading-none">Alpart Milano</h4>
+                        <span class="text-gray-400 text-sm italic">Patient</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-4xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow duration-300 testimonial-card">
+                <div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-8">
+                        "The app is so intuitive. Scheduling appointments takes seconds, and the video quality is excellent."
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <img class="w-10 h-10 rounded-full" src="image/avatar4.jpeg" alt="Rounded avatar">
+                    <div>
+                        <h4 class="font-bold text-gray-900 leading-none">Robert Miller</h4>
+                        <span class="text-gray-400 text-sm italic">Patient</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════ DAILY TIP ══════════════════════ -->
+    <div class="py-10">
+        <div class="container mx-auto px-6">
+
+            <!-- ★ ADD: tip-banner + reveal -->
+            <div class="relative overflow-hidden bg-gradient-to-r from-sky-400 to-blue-600 rounded-[2.5rem] p-10 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl tip-banner reveal">
+
+                <div class="bg-white/20 p-6 rounded-full animate-pulse">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+                </div>
+
+                <div class="text-center md:text-left flex-1">
+                    <span class="bg-white/30 px-4 py-1 rounded-full text-xs font-bold uppercase mb-4 inline-block">Daily Tip</span>
+                    <h3 class="text-2xl md:text-3xl font-bold mb-2">
+                        {{ currentTip.title }}
+                    </h3>
+                    <p class="text-sky-50 opacity-90 text-lg">
+                        {{ currentTip.text }}
+                    </p>
+                </div>
+
+                <!-- ★ ADD: tip-btn -->
+                <button (click)="nextTip()" class="bg-white text-sky-600 px-8 py-3 rounded-2xl font-bold hover:bg-sky-50 transition-all active:scale-95 tip-btn">
+          Read More
+        </button>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════ HOW IT WORKS ══════════════════════ -->
+    <div class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+
+            <!-- ★ ADD: reveal to section heading -->
+            <h2 class="text-3xl font-bold text-center mb-12 section-heading reveal">How it Works</h2>
+
+            <div class="flex flex-col md:flex-row gap-8 justify-between">
+
+                <!-- ★ ADD: step-item to each step -->
+                <div class="flex-1 text-center relative step-item">
+                    <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-lg">1</div>
+                    <h3 class="font-bold text-lg mb-2">Find Your Case</h3>
+                    <p class="text-gray-500 text-sm">Search for your chronic condition in our library.</p>
+                </div>
+
+                <div class="flex-1 text-center relative step-item">
+                    <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-lg">2</div>
+                    <h3 class="font-bold text-lg mb-2">Daily Tracking</h3>
+                    <p class="text-gray-500 text-sm">Log your metrics like sugar level or blood pressure.</p>
+                </div>
+
+                <div class="flex-1 text-center relative step-item">
+                    <div class="w-16 h-16 bg-sky-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-sky-100 shadow-lg animate-bounce">3</div>
+                    <h3 class="font-bold text-lg mb-2">Get Insights</h3>
+                    <p class="text-gray-500 text-sm">Receive AI-powered reports about your health.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════ FAQ ══════════════════════ -->
+    <div class="py-16 bg-gray-50">
+        <div class="max-w-3xl mx-auto px-6">
+
+            <!-- ★ ADD: reveal to heading -->
+            <h2 class="text-3xl font-bold text-center mb-10 section-heading reveal">Common Questions</h2>
+
+            <!-- FAQ arrows rotate via CSS details[open] selector — no HTML changes needed -->
+            <div class="space-y-4">
+
+                <details class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm" open>
+                    <summary class="flex justify-between items-center font-bold text-gray-800 cursor-pointer list-none">
+                        How do I track my blood sugar?
+                        <i class="fa-solid fa-circle-down"></i>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        You can use our dashboard to log your readings manually or sync with supported smart devices for real-time updates.
+                    </p>
+                </details>
+
+                <details class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <summary class="flex justify-between items-center font-bold text-gray-800 cursor-pointer list-none">
+                        Is my medical data secure?
+                        <i class="fa-solid fa-circle-down"></i>
+                    </summary>
+                    <p class="text-gray-600 mt-4">
+                        Yes, we use end-to-end encryption to ensure your health records are only visible to you and your doctor.
+                    </p>
+                </details>
+
+                <details class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <summary class="flex justify-between items-center font-bold text-gray-800 cursor-pointer list-none">
+                        What are the early symptoms of Alzheimer's?
+                        <i class="fa-solid fa-circle-down"></i>
+                    </summary>
+                    <p class="text-gray-600 mt-4">
+                        Early symptoms include memory loss, difficulty finding words, confusion about time or place, and problems with daily tasks.
+                    </p>
+                </details>
+
+                <details class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <summary class="flex justify-between items-center font-bold text-gray-800 cursor-pointer list-none">
+                        How can I reduce my risk of heart disease
+                        <i class="fa-solid fa-circle-down"></i>
+                    </summary>
+                    <p class="text-gray-600 mt-4">
+                        You can reduce your risk by eating a balanced diet, exercising regularly, avoiding smoking, managing stress, and checking your blood pressure and cholesterol levels.
+                    </p>
+                </details>
+
+            </div>
+        </div>
+    </div>
+
+</section>

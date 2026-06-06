@@ -1,0 +1,163 @@
+<div class="p-4 md:p-6 bg-[#F8FAFC] min-h-screen">
+    <app-sidebar></app-sidebar>
+    <div class="max-w-4xl mx-auto space-y-6 md:pl-20">
+        <aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+            <div>
+                <img src="/Picture1.png" [routerLink]="isDoctor ? '/dashboard' : isCaregiver ? '/dashboard-caregiver' : '/dashboard-p'" class="w-12 hover:scale-105 cursor-pointer">
+            </div>
+            <div class="flex flex-col gap-6 text-gray-400">
+                <button *ngFor="let item of sidebarLinks" class="p-2 transition-colors" routerLinkActive="bg-purple-50 text-blue-600 rounded-lg" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="item.route">
+                <i [ngClass]="item.icon"></i>
+            </button>
+            </div>
+        </aside>
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-[#1E293B]">My Reports</h1>
+                <p class="text-sm text-gray-400 mt-1">Medical reports from your doctors</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span *ngIf="totalUnread() > 0" class="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
+          {{ totalUnread() }} new comment{{ totalUnread() !== 1 ? 's' : '' }}
+        </span>
+                <button (click)="goBack()" class="text-sm text-gray-500 hover:text-gray-800 transition-colors">← Back</button>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-3 text-sm">
+            {{ errorMessage }}
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoading && !selectedReport" class="flex justify-center py-16">
+            <svg class="animate-spin h-8 w-8 text-blue-400" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+        </div>
+
+        <!-- Empty -->
+        <div *ngIf="!isLoading && reports.length === 0" class="bg-white rounded-[24px] border border-gray-100 shadow-sm p-16 text-center">
+            <div class="text-5xl mb-4">📋</div>
+            <p class="text-[#1E293B] font-semibold text-lg">No reports yet</p>
+            <p class="text-gray-400 text-sm mt-2">Your doctor will send reports here after your visits</p>
+        </div>
+
+        <!-- Report Cards -->
+        <div *ngIf="!isLoading" class="space-y-4">
+            <div *ngFor="let report of reports" class="bg-white rounded-[24px] border shadow-sm overflow-hidden cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5" [class.border-blue-200]="report.unread_comments > 0" [class.border-gray-100]="report.unread_comments === 0"
+                (click)="openReport(report)">
+
+                <div class="p-5 flex items-start gap-4">
+                    <!-- Icon -->
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 text-xl">
+                        📋
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2 flex-wrap">
+                            <div>
+                                <h3 class="font-bold text-[#1E293B] text-base">{{ report.title }}</h3>
+                                <p class="text-sm text-gray-500 mt-0.5">Dr. {{ report.doctor?.name }}</p>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span *ngIf="report.unread_comments > 0" class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  {{ report.unread_comments }} new
+                </span>
+                                <span *ngIf="report.comments && report.comments.length > 0 && report.unread_comments === 0" class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full">
+                  {{ report.comments.length }} comment{{ report.comments.length !== 1 ? 's' : '' }}
+                </span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ report.summary }}</p>
+                        <p class="text-xs text-gray-300 mt-2">{{ report.created_at | date: 'MMMM d, y' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══ REPORT DETAIL MODAL ═════════════════════════════════════════════ -->
+<div *ngIf="selectedReport" class="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/40 backdrop-blur-sm p-3 md:p-6">
+    <div class="bg-white rounded-[28px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+
+        <!-- Modal Header -->
+        <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h2 class="font-bold text-[#1E293B] text-lg">{{ selectedReport.title }}</h2>
+                    <p class="text-gray-400 text-sm mt-0.5">
+                        Dr. {{ selectedReport.doctor?.name }} · {{ selectedReport.created_at | date: 'MMMM d, y' }}
+                    </p>
+                </div>
+                <button (click)="closeReport()" class="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none ml-4">✕</button>
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto">
+
+            <!-- Summary / Vitals -->
+            <div class="px-6 py-5 border-b border-gray-50">
+                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Summary / Vitals</p>
+                <p class="text-sm text-gray-700 leading-relaxed">{{ selectedReport.summary }}</p>
+            </div>
+
+            <!-- Final Report -->
+            <div *ngIf="selectedReport.final_report" class="px-6 py-5 border-b border-gray-50">
+                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Medical Report</p>
+                <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ selectedReport.final_report }}</p>
+            </div>
+
+            <!-- Doctor Comments -->
+            <div class="px-6 py-5">
+                <p class="text-xs font-bold text-gray-400 uppercase mb-3">
+                    Doctor & Caregiver Comments
+                    <span *ngIf="selectedReport.comments && selectedReport.comments.length > 0" class="ml-1 text-blue-500">
+            ({{ selectedReport.comments.length }})
+          </span>
+                </p>
+
+                <div *ngIf="!selectedReport.comments || selectedReport.comments.length === 0" class="text-center py-8 text-gray-300">
+                    <div class="text-3xl mb-2">💬</div>
+                    <p class="text-sm">No comments yet from your doctor</p>
+                </div>
+
+                <div *ngIf="selectedReport.comments && selectedReport.comments.length > 0" class="space-y-3">
+                    <div *ngFor="let c of selectedReport.comments" class="rounded-2xl p-4 border flex items-start gap-3" [class.bg-blue-50]="!c.is_read" [class.border-blue-200]="!c.is_read" [class.bg-[#F8FAFC]]="c.is_read" [class.border-gray-100]="c.is_read">
+
+                        <!-- Avatar -->
+                        <div class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 text-lg shadow-sm">
+                            {{ getRoleIcon(c.commenter_role) }}
+                        </div>
+
+                        <!-- Comment body -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-[#1E293B] text-sm">{{ c.commenter_name }}</span>
+                                <span class="text-xs text-white px-2 py-0.5 rounded-full" [class.bg-blue-500]="c.commenter_role === 'doctor'" [class.bg-purple-500]="c.commenter_role === 'caregiver'">
+                  {{ c.commenter_role }}
+                </span>
+                                <span *ngIf="!c.is_read" class="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">New</span>
+                                <span class="text-xs text-gray-400 ml-auto">{{ c.created_at | date: 'MMM d, h:mm a' }}</span>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-2 leading-relaxed">{{ c.comment }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Close Button -->
+        <div class="px-6 pb-6 pt-3 flex-shrink-0 border-t border-gray-50">
+            <button (click)="closeReport()" class="w-full bg-[#1E293B] hover:bg-[#0f172a] text-white font-semibold py-3 rounded-xl text-sm transition-all">
+        Close
+      </button>
+        </div>
+    </div>
+</div>

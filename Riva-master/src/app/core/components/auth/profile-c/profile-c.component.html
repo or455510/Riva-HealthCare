@@ -1,0 +1,205 @@
+<div class="min-h-screen bg-[#F8F9FB] font-sans flex">
+    <app-sidebar></app-sidebar>
+
+    <!-- ══════════════════ SIDEBAR ══════════════════ -->
+    <aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div>
+            <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12 hover:scale-105 transition-transform cursor-pointer">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button class="p-2 hover:text-indigo-600 transition-colors" routerLink="/dashboard-p">
+        <i class="fas fa-home"></i>
+      </button>
+            <button class="p-2 hover:text-indigo-600 transition-colors" routerLink="/add-new-medication">
+        <i class="fas fa-pills"></i>
+      </button>
+            <button class="p-2 hover:text-indigo-600 transition-colors" routerLink="/doctor-cards">
+        <i class="fa-solid fa-user-doctor"></i>
+      </button>
+            <button class="p-2 hover:text-indigo-600 transition-colors" routerLink="/chat">
+        <i class="fa-brands fa-rocketchat"></i>
+      </button>
+            <button class="p-2 hover:text-indigo-600 transition-colors" routerLink="/booking">
+        <i class="fa-solid fa-calendar"></i>
+      </button>
+            <button class="p-2 bg-indigo-50 text-indigo-600 rounded-lg" routerLink="/myprofile">
+        <i class="fa-solid fa-circle-user"></i>
+      </button>
+        </div>
+    </aside>
+
+    <!-- ══════════════════ CONTENT ══════════════════ -->
+    <div class="flex-1 md:ml-20">
+
+        <!-- LOADING -->
+        <div *ngIf="isLoading" class="flex items-center justify-center min-h-screen">
+            <div class="flex flex-col items-center gap-3">
+                <svg class="animate-spin h-10 w-10 text-indigo-500" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+                <p class="text-sm text-gray-400 font-medium">Loading caregiver profile...</p>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading" class="max-w-3xl mx-auto px-4 py-10 space-y-5">
+
+            <!-- ── Back ── -->
+            <button type="button" (click)="goBack()" class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">
+        <i class="fa-solid fa-arrow-left text-xs"></i> Back
+      </button>
+
+            <!-- ── Alerts ── -->
+            <div *ngIf="errorMessage" class="px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+                {{ errorMessage }}
+            </div>
+            <div *ngIf="successMessage" class="px-4 py-3 bg-green-50 border border-green-100 rounded-2xl text-sm text-green-600 font-medium">
+                {{ successMessage }}
+            </div>
+
+            <!-- ══════ HERO CARD ══════ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+
+                <!-- Cover -->
+                <div class="h-24 bg-gradient-to-r from-[#EEF2FF] to-[#E0E7FF]"></div>
+
+                <div class="px-6 pb-6">
+
+                    <div class="flex items-end justify-between -mt-12 mb-4">
+                        <img [src]="caregiverAvatar" class="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-md" alt="Caregiver" (error)="onAvatarError($event)">
+                        <button type="button" (click)="requestCaregiver()" [disabled]="followDisabled" class="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all border" [ngClass]="followDisabled ? 'bg-white text-indigo-600 border-indigo-200 opacity-70' : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100'">
+                            <i *ngIf="!isSubmittingFollow" class="fa-solid" [ngClass]="followStatus === 'active' || followStatus === 'accepted' ? 'fa-user-check' : followStatus === 'pending' ? 'fa-clock' : 'fa-user-plus'"></i>
+                            <i *ngIf="isSubmittingFollow" class="fa-solid fa-spinner fa-spin"></i>
+                            {{ followLabel }}
+                        </button>
+                    </div>
+
+                    <!-- Name + badge -->
+                    <div class="flex items-center gap-3 flex-wrap mb-3">
+                        <h1 class="text-xl font-bold text-[#1A2D51]">{{ caregiverName }}</h1>
+                        <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+              🧑‍⚕️ {{ specialty || 'Caregiver' }}
+            </span>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="space-y-1.5 mb-5">
+                        <p *ngIf="caregiverEmail" class="text-sm text-gray-500 flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-indigo-300 text-xs w-4"></i> {{ caregiverEmail }}
+                        </p>
+                        <p *ngIf="caregiverPhone" class="text-sm text-gray-500 flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-indigo-300 text-xs w-4"></i> {{ caregiverPhone }}
+                        </p>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">{{ experienceYears ?? '—' }}</p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Years Exp.</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">{{ salary ? (salary + ' EGP') : '—' }}</p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Salary/mo</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">{{ averageRating > 0 ? averageRating : '—' }}</p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Avg. Rating</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════ ABOUT ══════ -->
+            <div *ngIf="about" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-3">About</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ about }}</p>
+            </div>
+
+            <!-- ══════ REVIEWS ══════ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 space-y-5">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider">Patient Reviews</h3>
+                    <div *ngIf="totalReviews > 0" class="flex items-center gap-2">
+                        <div class="flex gap-0.5">
+                            <i *ngFor="let s of getStars(averageRating)" class="fa-star text-sm" [ngClass]="s ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-200'"></i>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700">{{ averageRating }}</span>
+                        <span class="text-xs text-gray-400">({{ totalReviews }})</span>
+                    </div>
+                </div>
+
+                <!-- Review cards -->
+                <div *ngIf="reviews.length > 0" class="space-y-4">
+                    <div *ngFor="let review of reviews" class="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <!-- Avatar initials -->
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-[#2D5BFF] font-black text-sm shrink-0">
+                            {{ review.patientName.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <p class="text-sm font-bold text-gray-700">{{ review.patientName }}</p>
+                                <span class="text-[11px] text-gray-400">{{ review.date }}</span>
+                            </div>
+                            <div class="flex gap-0.5 my-1">
+                                <i *ngFor="let s of getStars(review.rating)" class="fa-star text-xs" [ngClass]="s ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-200'"></i>
+                            </div>
+                            <p class="text-sm text-gray-500 leading-relaxed">{{ review.comment }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty -->
+                <div *ngIf="reviews.length === 0" class="text-center py-8 text-gray-400">
+                    <i class="fa-regular fa-star text-3xl mb-2 block text-gray-200"></i>
+                    <p class="text-sm font-medium">No reviews yet. Be the first!</p>
+                </div>
+
+                <!-- ── Write Review ── -->
+                <div class="border-t border-gray-100 pt-5 space-y-4">
+                    <h4 class="text-[13px] font-bold text-gray-700">Write a Review</h4>
+
+                    <!-- Stars picker -->
+                    <div class="flex items-center gap-1">
+                        <button *ngFor="let star of [1,2,3,4,5]" type="button" (click)="setRating(star)" (mouseenter)="hoverStar(star)" (mouseleave)="clearHover()" class="text-2xl transition-transform hover:scale-110">
+              <i class="fa-star"
+                 [ngClass]="star <= (hoveredStar || newRating)
+                   ? 'fa-solid text-yellow-400'
+                   : 'fa-regular text-gray-300'"></i>
+            </button>
+                        <span class="text-xs text-gray-400 ml-2 font-medium">
+              {{
+                newRating === 1 ? 'Poor'      :
+                newRating === 2 ? 'Fair'      :
+                newRating === 3 ? 'Good'      :
+                newRating === 4 ? 'Very Good' :
+                newRating === 5 ? 'Excellent' :
+                'Select rating'
+              }}
+            </span>
+                    </div>
+
+                    <!-- Comment -->
+                    <textarea [(ngModel)]="newComment" rows="3" placeholder="Share your experience with this doctor..." class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm resize-none">
+          </textarea>
+
+                    <!-- Submit -->
+                    <button type="button" (click)="submitReview()" [disabled]="isSubmittingReview" class="w-full bg-[#2D5BFF] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1A4BFF] transition-all disabled:opacity-60 flex items-center justify-center gap-2 active:scale-95">
+            <svg *ngIf="isSubmittingReview" class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            {{ isSubmittingReview ? 'Submitting...' : 'Submit Review' }}
+          </button>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+</div>

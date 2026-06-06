@@ -1,0 +1,183 @@
+<div class="min-h-screen bg-slate-50 font-sans pb-24 md:pb-8 md:pl-20" dir="ltr">
+    <app-sidebar></app-sidebar>
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div class="text-blue-600 font-bold text-xl">
+            <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/dashboard-p">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/add-new-medication">
+                <i class="fas fa-pills"></i>
+            </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/doctor-cards">
+                <i class="fa-solid fa-user-doctor"></i>
+            </button>
+
+            <button class="p-2 hover:text-blue-600" routerLink="/chat">
+                <i class="fa-brands fa-rocketchat"></i>
+            </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/myprofile">
+                <i class="fa-solid fa-circle-user"></i>
+            </button>
+            <button class="p-2 bg-purple-50 text-blue-600 rounded-lg" routerLink="/caregiver-cards">
+                <i class="fa-solid fa-user-nurse"></i>
+            </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/my-reports"><i class="fa-solid fa-file-medical"></i></button>
+
+        </div>
+    </aside>
+
+    <!-- ===================== BOTTOM NAVIGATION ===================== -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-100 flex justify-around items-center py-3 z-50 md:hidden shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button class="flex flex-col items-center gap-1 text-gray-400" routerLink="/dashboard-p">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-gray-400" routerLink="/add-new-medication">
+            <i class="fas fa-pills text-lg"></i>
+            <span class="text-[10px] font-bold">Meds</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-gray-400" routerLink="/doctor-cards">
+            <i class="fa-solid fa-user-doctor text-lg"></i>
+            <span class="text-[10px] font-bold">Doctors</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-purple-600" routerLink="/caregiver-cards">
+            <i class="fa-solid fa-hands-holding-heart text-lg"></i>
+            <span class="text-[10px] font-bold">Caregivers</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-gray-400" routerLink="/chat">
+            <i class="fa-brands fa-rocketchat"></i>
+            <span class="text-[10px] font-bold">Chat</span>
+        </button>
+    </nav>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="p-6 md:p-10 bg-gradient-to-br from-white to-[#F9FBFF] min-h-screen">
+
+        <!-- Page Title -->
+        <div class="text-center mb-10 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-black text-slate-800 leading-tight">
+                Choose your <span class="text-purple-500">Caregiver</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-3">
+                You can change this later at any time
+            </p>
+        </div>
+
+        <!-- GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1400px] mx-auto">
+
+            <!-- ===================== CAREGIVERS LIST ===================== -->
+            <div class="order-2 lg:order-1 lg:col-span-8">
+
+                <!-- Loading State -->
+                <div *ngIf="isLoading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div *ngFor="let i of [1,2,3,4]" class="bg-white border border-gray-100 p-6 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center animate-pulse">
+                        <div class="w-20 h-20 rounded-2xl bg-slate-200 mb-4"></div>
+                        <div class="h-4 bg-slate-200 rounded w-32 mb-2"></div>
+                        <div class="h-3 bg-slate-100 rounded w-24 mb-3"></div>
+                        <div class="h-3 bg-slate-100 rounded w-full mb-2"></div>
+                        <div class="h-3 bg-slate-100 rounded w-3/4 mb-6"></div>
+                        <div class="h-10 bg-slate-200 rounded-xl w-full"></div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div *ngIf="!isLoading && errorMessage" class="flex flex-col items-center justify-center py-20 text-center">
+                    <i class="fas fa-exclamation-circle text-4xl text-red-300 mb-4"></i>
+                    <p class="text-slate-500 font-semibold">{{ errorMessage }}</p>
+                    <button (click)="ngOnInit()" class="mt-4 px-6 py-2 bg-purple-600 text-white text-xs font-black uppercase tracking-widest rounded-xl">
+                        Try Again
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!isLoading && !errorMessage && caregivers.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
+                    <i class="fa-solid fa-hands-holding-heart text-5xl text-slate-200 mb-4"></i>
+                    <p class="text-slate-400 font-semibold">No caregivers available at the moment.</p>
+                </div>
+
+                <!-- Caregivers Grid -->
+                <div *ngIf="!isLoading && caregivers.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+
+                    <div *ngFor="let caregiver of caregivers" class="bg-white border border-gray-100 p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all flex flex-col items-center text-center w-full h-fit">
+
+                        <!-- صورة + تقييم -->
+                        <div class="relative mb-4">
+                            <img [src]="getAvatarUrl(caregiver)" [alt]="getCaregiverName(caregiver)" class="w-20 h-20 rounded-2xl object-cover grayscale hover:grayscale-0 transition-all">
+                            <span *ngIf="getRating(caregiver)" class="absolute -top-1 -right-1 bg-yellow-400 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                                ★ {{ getRating(caregiver) }}
+                            </span>
+                        </div>
+
+                        <!-- اسم وتخصص -->
+                        <h3 class="font-bold text-base text-slate-800 tracking-tight">
+                            {{ getCaregiverName(caregiver) }}
+                        </h3>
+                        <p class="text-[10px] text-purple-500 font-black uppercase tracking-wider mt-1 mb-2">
+                            {{ getSpecialty(caregiver) }}
+                        </p>
+
+                        <!-- Experience + Salary -->
+                        <div class="flex gap-3 mb-3">
+                            <span *ngIf="getExperience(caregiver)" class="text-[10px] bg-purple-50 text-purple-600 font-bold px-3 py-1 rounded-full">
+                                🕐 {{ getExperience(caregiver) }}
+                            </span>
+                            <span *ngIf="getSalary(caregiver)" class="text-[10px] bg-green-50 text-green-600 font-bold px-3 py-1 rounded-full">
+                                💰 {{ getSalary(caregiver) }}
+                            </span>
+                        </div>
+
+                        <!-- وصف مختصر -->
+                        <p class="text-xs text-slate-500 leading-relaxed mb-6 line-clamp-2 px-2">
+                            {{ getBio(caregiver) }}
+                        </p>
+
+                        <!-- زر الاختيار -->
+                        <button (click)="selectCaregiver(caregiver)" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all active:scale-95">
+                            View Profile
+                        </button>
+                        <button (click)="requestCaregiver(caregiver, $event)" [disabled]="submittingCaregiverId === caregiver.id || caregiver.follow_status === 'pending' || caregiver.follow_status === 'active' || caregiver.follow_status === 'accepted'" class="w-full mt-3 bg-white border border-purple-100 text-purple-600 hover:bg-purple-50 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-60">
+                            {{ followButtonLabel(caregiver) }}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===================== RIGHT SIDE ===================== -->
+            <div class="order-1 lg:order-2 lg:col-span-4 space-y-6">
+
+                <!-- Riva Card -->
+                <div class="bg-[#F5F0FF] rounded-[2.5rem] p-6 flex flex-col items-center border border-purple-50">
+                    <div class="w-48 h-48 md:w-64 md:h-64">
+                        <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" style="width:100%; height:100%; transform: rotateY(180deg);">
+                        </spline-viewer>
+                    </div>
+                    <div class="mt-4 bg-white px-5 py-3 rounded-2xl text-center text-[12px] font-bold text-slate-600 shadow-sm">
+                        Find a trusted caregiver for your loved ones 💜
+                    </div>
+                </div>
+
+                <!-- Upcoming Visit Card -->
+                <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Upcoming Visit</h4>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Skip Link -->
+        <div class="text-center mt-12">
+            <a href="#" class="text-[11px] font-black text-purple-600 uppercase tracking-widest hover:underline opacity-60">
+                Skip for now
+            </a>
+        </div>
+
+    </main>
+</div>

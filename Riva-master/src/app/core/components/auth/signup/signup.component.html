@@ -1,0 +1,154 @@
+<!-- Container -->
+<div class="min-h-screen w-full bg-[#F8F9FB] font-sans flex overflow-hidden">
+
+    <!-- Left Section -->
+    <div class="hidden md:flex w-1/2 relative overflow-hidden bg-gradient-to-br from-[#E6F0FF] to-[#D1E4FF]">
+
+        <!-- Logo -->
+        <div class="absolute top-10 left-10 flex flex-col items-center z-30">
+            <img src="/Picture1.png" class="w-24 h-24 object-contain" alt="RIVA Logo">
+        </div>
+
+        <!-- Floating Icons -->
+        <div class="absolute top-1/4 right-20 bg-white/70 backdrop-blur-md p-3 rounded-2xl shadow-sm z-20">
+            <i class="fa-solid fa-user-doctor text-green-500 text-xl"></i>
+        </div>
+        <div class="absolute top-30 left-30 bg-white/70 backdrop-blur-md p-3 rounded-2xl shadow-sm z-20">
+            <i class="fa-solid fa-heart-pulse text-[#2D5BFF] text-xl"></i>
+        </div>
+        <div class="absolute bottom-40 left-10 bg-white/70 backdrop-blur-md p-3 rounded-2xl shadow-sm z-20">
+            <i class="fa-solid fa-shield-halved text-orange-400 text-xl"></i>
+        </div>
+
+        <!-- 3D Viewer -->
+        <div class="relative z-10 flex flex-col items-center justify-center w-full h-full pt-20">
+            <div class="w-full h-[50%] relative flex items-center justify-center">
+                <div class="w-[85%] h-full flex items-center justify-center">
+                    <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" class="w-full h-full"></spline-viewer>
+                </div>
+            </div>
+
+            <!-- Card -->
+            <div class="mt-10 bg-white/90 backdrop-blur-sm px-8 py-4 rounded-3xl shadow-xl border border-white/50 max-w-sm text-center transform transition-all hover:scale-105">
+                <p class="text-[#1A2D51] text-sm font-semibold leading-relaxed">
+                    Welcome to Safia Care! Let's get you registered in just a few steps.
+                </p>
+            </div>
+
+            <!-- Indicators -->
+            <div class="flex gap-2 mt-8">
+                <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Right Section -->
+    <div class="w-full md:w-1/2 flex flex-col bg-white p-8 md:px-12 lg:px-20 justify-start overflow-y-auto">
+
+        <!-- Form -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full max-w-[500px] mx-auto py-10 space-y-5">
+
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
+                <p class="text-gray-400 text-sm mt-1">Please fill in the details to get started.</p>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">First Name *</label>
+                    <input type="text" formControlName="first_name" placeholder="Enter first name" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">Last Name *</label>
+                    <input type="text" formControlName="last_name" placeholder="Enter last name" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">Phone Number *</label>
+                    <input type="tel" formControlName="phone" placeholder="+1 (555) 123-4567" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">Email *</label>
+                    <input type="email" formControlName="email" placeholder="your.email@example.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">Password *</label>
+                    <input type="password" formControlName="password" placeholder="Password" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[12px] font-bold text-gray-700 ml-1">Confirm Password *</label>
+                    <input type="password" formControlName="password_confirmation" placeholder="Confirm Password" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm outline-none transition-all"
+                    />
+
+                    <!-- ✅ رسالة الخطأ الجديدة -->
+                    <p *ngIf="form.errors?.['mismatch'] && form.touched" class="text-red-500 text-xs mt-1">
+                        Passwords do not match
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Roles -->
+            <div class="space-y-3 pt-2">
+                <label class="text-[12px] font-bold text-gray-700 ml-1">Select Role *</label>
+
+                <label class="flex items-center p-4 border border-gray-100 rounded-2xl cursor-pointer hover:bg-blue-50/50 transition-all">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-4">
+                        <i class="fa-solid fa-user text-blue-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[13px] font-bold text-gray-800">Patient</p>
+                        <p class="text-[11px] text-gray-400 font-medium">I'm seeking medical care and support</p>
+                    </div>
+                    <input type="radio" formControlName="role" value="patient" class="w-4 h-4 text-blue-600" />
+                </label>
+
+                <label class="flex items-center p-4 border border-gray-100 rounded-2xl cursor-pointer hover:bg-green-50/50 transition-all">
+                    <div class="bg-green-100 p-2 rounded-lg mr-4">
+                        <i class="fa-solid fa-user-doctor text-green-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[13px] font-bold text-gray-800">Doctor</p>
+                        <p class="text-[11px] text-gray-400 font-medium">I'm a medical professional providing care</p>
+                    </div>
+                    <input type="radio" formControlName="role" value="doctor" class="w-4 h-4 text-blue-600" />
+                </label>
+
+                <label class="flex items-center p-4 border border-gray-100 rounded-2xl cursor-pointer hover:bg-purple-50/50 transition-all">
+                    <div class="bg-purple-100 p-2 rounded-lg mr-4">
+                        <i class="fa-solid fa-heart text-purple-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[13px] font-bold text-gray-800">Caregiver</p>
+                        <p class="text-[11px] text-gray-400 font-medium">I'm caring for a family member or patient</p>
+                    </div>
+                    <input type="radio" formControlName="role" value="caregiver" class="w-4 h-4 text-blue-600" />
+                </label>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex flex-col gap-2">
+                <button type="submit" class="w-full bg-[#2D5BFF] text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1A4BFF] transition-all">
+                    Continue
+                </button>
+                <!-- google-button --><button type="button" (click)="loginWithGoogle()" class="w-full border border-gray-100 py-3 rounded-xl font-semibold text-[13px] text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center"> <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4 mr-2" alt="google"> Google account </button>
+
+                <p class="text-red-500 text-sm text-center mt-2">{{ errorMessage }}</p>
+                <p class="text-green-500 text-sm text-center mt-2">{{ successMessage }}</p>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

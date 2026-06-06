@@ -1,0 +1,265 @@
+<div class="min-h-screen bg-slate-100 font-sans">
+
+    <app-sidebar></app-sidebar>
+
+    <!-- MAIN WRAPPER -->
+    <div class="md:pl-20">
+
+        <!-- ══ HEADER ══ -->
+        <header class="h-20 bg-[#f0f7ff] flex justify-between items-center px-8 shrink-0">
+            <div>
+                <h1 class="text-xl font-extrabold text-slate-800">Patient Dashboard</h1>
+                <p class="text-xs text-slate-400">Welcome back, {{ currentpatient.name }}</p>
+            </div>
+            <div class="flex items-center gap-3 bg-white p-1.5 pr-4 rounded-2xl shadow-sm border border-blue-50">
+                <button routerLink="/notifications" class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <app-logout-button></app-logout-button>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-700 leading-3">{{ currentpatient.name }}</p>
+                    <span class="text-[9px] text-green-500 font-bold uppercase">● {{ currentpatient.status }}</span>
+                </div>
+                <img *ngIf="currentpatient.avatar" [src]="currentpatient.avatar" class="w-9 h-9 rounded-full object-cover" alt="Profile">
+                <div *ngIf="!currentpatient.avatar" class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                    {{ patientInitials }}
+                </div>
+            </div>
+        </header>
+
+        <!-- ══ CONTENT ══ -->
+        <div class="p-4 md:p-8 pb-24 md:pb-8">
+            <div class="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 max-w-[1600px] mx-auto">
+
+                <!-- LEFT PANEL -->
+                <div class="order-1 md:order-2 md:col-span-4 space-y-6 md:space-y-8">
+                    <div
+                        class="bg-blue-50 rounded-[30px] md:rounded-[40px] h-[250px] md:h-[320px] relative overflow-hidden shadow-sm border border-blue-100 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-100"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Open Riva AI Assistant"
+                        (click)="openAiAssistant()"
+                        (keydown.enter)="openAiAssistant()"
+                        (keydown.space)="$event.preventDefault(); openAiAssistant()">
+                        <div class="absolute top-4 left-4 bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-sm z-10">
+                            <p class="text-blue-600 font-bold text-sm">Hey! I'm Riva 👋</p>
+                        </div>
+                        <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" class="w-full h-full"></spline-viewer>
+                    </div>
+
+                    <div class="bg-white p-6 md:p-10 rounded-[30px] md:rounded-[40px] shadow-sm space-y-6 border border-white">
+                        <h3 class="text-xl md:text-2xl font-black text-slate-800">Check-in</h3>
+
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-700">Pain Level</span>
+                                <span [ngClass]="painLevel > 7 ? 'text-red-500 bg-red-50' : 'text-blue-600 bg-blue-50'" class="px-3 py-1 rounded-full text-xs font-bold transition-all">{{ painLevel }}</span>
+                            </div>
+                            <input type="range" min="1" max="10" [(ngModel)]="painLevel" (input)="updateMoodFromSlider()" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                            <div class="flex justify-between items-center px-1">
+                                <button *ngFor="let m of moods" (click)="selectMood(m)" class="text-3xl md:text-4xl transition-all" [ngClass]="selectedMood === m.id ? 'scale-125 grayscale-0' : 'grayscale opacity-40 scale-90'">
+                                    {{ m.emoji }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea [(ngModel)]="notes" class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-blue-100 outline-none transition-all" rows="3" placeholder="Symptoms..."></textarea>
+
+                        <div class="space-y-3">
+                            <p class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Upload Scans / Labs</p>
+                            <div class="relative group">
+                                <input type="file" (change)="onFileChange($event)" id="mainUpload" class="hidden" accept="image/*,application/pdf">
+                                <label for="mainUpload" class="flex flex-col items-center justify-center w-full py-4 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50 hover:bg-white hover:border-blue-300 transition-all cursor-pointer">
+                                    <div class="flex items-center gap-3" *ngIf="!uploadedFile">
+                                        <i class="fas fa-cloud-upload-alt text-blue-500"></i>
+                                        <span class="text-xs font-bold text-slate-500">Add Photo or PDF</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 w-full px-4" *ngIf="uploadedFile">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 overflow-hidden">
+                                            <img *ngIf="filePreview" [src]="filePreview" class="w-full h-full object-cover">
+                                            <i *ngIf="!filePreview" class="fas fa-file-pdf"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-[10px] font-bold text-slate-700 truncate">{{ fileName }}</p>
+                                            <p class="text-[8px] text-slate-400 uppercase">Ready to upload</p>
+                                        </div>
+                                        <button (click)="$event.preventDefault(); removeFile()" class="p-2 text-red-400 hover:text-red-600">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div *ngIf="successMessage" class="text-green-600 text-sm font-bold text-center bg-green-50 p-3 rounded-2xl">
+                            {{ successMessage }}
+                        </div>
+                        <div *ngIf="errorMessage" class="text-red-500 text-sm font-bold text-center bg-red-50 p-3 rounded-2xl">
+                            {{ errorMessage }}
+                        </div>
+
+                        <button (click)="submitCheckIn()" [disabled]="isLoading" class="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-slate-200 disabled:opacity-60 disabled:cursor-not-allowed">
+                            {{ isLoading ? 'Submitting...' : 'Submit Daily Report' }}
+                        </button>
+                        <button (click)="sendEmergencyAlert()" [disabled]="isEmergencyLoading" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-red-100 disabled:opacity-60 disabled:cursor-not-allowed">
+                            {{ isEmergencyLoading ? 'Sending Alert...' : 'Emergency Alert' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL -->
+                <div class="order-2 md:order-1 md:col-span-8 space-y-6 md:space-y-8">
+
+                    <div class="relative bg-gradient-to-br from-white to-blue-50 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-sm min-h-[500px] md:h-[600px] border border-white flex flex-col justify-center overflow-visible">
+                        <div class="relative z-10 w-full md:w-[400px]">
+                            <span class="text-blue-500 text-xs uppercase font-black tracking-widest bg-blue-50 px-3 py-1 rounded-full">System Active</span>
+                            <h1 class="text-4xl md:text-6xl font-black text-slate-800 mt-4 leading-tight">Disease Analysis</h1>
+                            <p class="text-gray-500 mt-4 text-sm leading-relaxed">Monitoring chronic conditions and oncological markers.</p>
+                        </div>
+                        <div class="absolute right-0 bottom-0 h-full w-full md:w-auto flex justify-end z-20">
+                            <div class="relative h-full aspect-[2/3] flex items-end">
+                                <img src="/human.png" class="h-[90%] object-contain opacity-40 md:opacity-100 ml-auto">
+                                <div *ngFor="let marker of diseaseMarkers" class="absolute group" [style.top]="marker.top" [style.left]="marker.left">
+                                    <div class="relative flex h-5 w-5 cursor-pointer">
+                                        <span class="animate-ping absolute h-full w-full rounded-full opacity-75" [ngClass]="marker.pingClass"></span>
+                                        <span class="relative inline-flex rounded-full h-5 w-5 border-2 border-white shadow-lg" [ngClass]="marker.colorClass"></span>
+                                    </div>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-72 p-5 bg-white shadow-2xl rounded-[2rem] border border-blue-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                                        <h4 class="font-black text-slate-700 text-xs mb-1 uppercase tracking-tighter italic">{{ marker.label }}</h4>
+                                        <p class="text-[11px] text-slate-600 font-bold">{{ marker.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
+
+                        <!-- Today's Medication -->
+                        <div class="bg-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] shadow-sm border border-white">
+                            <h3 class="font-bold text-lg mb-6">Today's Medication</h3>
+
+                            <!-- Loading -->
+                            <div *ngIf="isLoadingMed" class="flex justify-center py-6">
+                                <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                            </div>
+
+                            <!-- No pending medication -->
+                            <div *ngIf="!isLoadingMed && !todayMedication" class="text-center py-6 text-slate-400">
+                                <i class="fas fa-pills text-3xl mb-2 text-slate-200"></i>
+                                <p *ngIf="allCompletedToday" class="text-sm font-semibold text-green-600">All medications for today are completed.</p>
+                                <p *ngIf="!allCompletedToday && missedDoses.length > 0" class="text-sm font-semibold text-red-500">You missed medication today. Your caregiver has been notified.</p>
+                                <p *ngIf="!allCompletedToday && treatmentCompleted" class="text-sm font-semibold">Treatment completed.</p>
+                                <p *ngIf="!allCompletedToday && missedDoses.length === 0 && !treatmentCompleted" class="text-sm font-semibold">No medications scheduled for today.</p>
+                            </div>
+
+                            <div *ngIf="!isLoadingMed && missedDoses.length > 0" class="mb-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+                                <div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-red-500 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-red-600">Medication missed</p>
+                                    <p class="text-xs text-red-500 mt-0.5">
+                                        You missed {{ missedDoses[0].name }} scheduled at {{ missedDoses[0].scheduled_time }}. Your caregiver has been notified.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Medication Card -->
+                            <div *ngIf="!isLoadingMed && todayMedication">
+
+                                <!-- ✅ Missed Warning -->
+                                <div *ngIf="isMissed" class="mb-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3 animate-pulse">
+                                    <div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                                        <i class="fas fa-exclamation-triangle text-red-500 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-black text-red-600">Missed Medication!</p>
+                                        <p class="text-xs text-red-400 mt-0.5">
+                                            You missed <strong>{{ todayMedication.drug_name || todayMedication.name }}</strong> at {{ todayMedication.schedule_time }}. Your caregiver has been notified.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Medication Info -->
+                                <div class="flex items-center gap-4 p-4 rounded-3xl mb-6 border transition-all" [ngClass]="isMissed
+                                        ? 'border-red-100 bg-red-50/40'
+                                        : 'border-slate-100 bg-slate-50'">
+                                    <div class="p-3 rounded-2xl" [ngClass]="isMissed ? 'bg-red-100' : 'bg-blue-100'">
+                                        <i class="fas fa-pills text-xl" [ngClass]="isMissed ? 'text-red-400' : 'text-blue-500'"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-800">{{ todayMedication.drug_name || todayMedication.name }}</p>
+                                        <p class="text-gray-400 text-sm">{{ todayMedication.dosage }}</p>
+                                        <p class="text-xs font-bold mt-0.5" [ngClass]="isMissed ? 'text-red-400' : 'text-blue-500'">
+                                            ⏰ {{ todayMedication.schedule_time }}
+                                            <span *ngIf="isMissed" class="ml-1 text-red-500">(Missed)</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex gap-3">
+                                    <button (click)="onTakeMedication(todayMedication)" [disabled]="loadingDoseIds.has(todayMedication.id)" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl font-bold text-sm shadow-lg shadow-green-100 transition-all active:scale-95 disabled:opacity-60">
+                                        <span *ngIf="!loadingDoseIds.has(todayMedication.id)">Took it</span>
+                                        <span *ngIf="loadingDoseIds.has(todayMedication.id)" class="inline-flex items-center gap-2">
+                                            <i class="fas fa-circle-notch fa-spin"></i>
+                                            Saving
+                                        </span>
+                                    </button>
+                                    <button (click)="remindLater(todayMedication)" [disabled]="loadingDoseIds.has(todayMedication.id)" class="flex-1 bg-amber-400 hover:bg-amber-500 text-white py-3 rounded-2xl font-bold text-sm shadow-lg shadow-amber-100 transition-all active:scale-95 disabled:opacity-60">
+                                        Remind later
+                                    </button>
+                                </div>
+                                <div *ngIf="medicationDoses.length > 0" class="mt-5 space-y-2">
+                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Today schedule</p>
+                                    <div *ngFor="let dose of medicationDoses" class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+                                        <span class="font-semibold text-slate-700">{{ dose.name }} · {{ dose.scheduled_time }}</span>
+                                        <span class="text-xs font-bold" [ngClass]="dose.status === 'taken' ? 'text-green-600' : dose.status === 'missed' ? 'text-red-500' : 'text-slate-400'">{{ dose.status }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <div *ngIf="!isLoadingMed && !todayMedication && medicationDoses.length > 0" class="mt-5 space-y-2">
+                                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Today schedule</p>
+                                <div *ngFor="let dose of medicationDoses" class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+                                    <span class="font-semibold text-slate-700">{{ dose.name }} · {{ dose.scheduled_time }}</span>
+                                    <span class="text-xs font-bold" [ngClass]="dose.status === 'taken' ? 'text-green-600' : dose.status === 'missed' ? 'text-red-500' : 'text-slate-400'">{{ dose.status }}</span>
+                                </div>
+                            </div>
+                        <!-- Adherence -->
+                        <div class="bg-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] shadow-sm flex flex-col items-center border border-white">
+                            <h3 class="font-bold text-lg self-start mb-4">Adherence</h3>
+                            <div class="relative w-40 h-40 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="35%" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100" />
+                                    <circle cx="50%" cy="50%" r="35%" stroke="currentColor" stroke-width="10" fill="transparent"
+                                        [style.stroke-dasharray]="'calc(2 * 3.14159 * 35%)'"
+                                        [style.stroke-dashoffset]="'calc(2 * 3.14159 * 35% * (1 - ' + adherence / 100 + '))'"
+                                        stroke-linecap="round" class="text-blue-500 transition-all duration-1000" />
+                                </svg>
+                                <div class="absolute text-center">
+                                    <span class="text-3xl font-black text-blue-600">{{ adherence }}%</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-6 overflow-x-auto w-full justify-center pb-2">
+                                <div *ngFor="let d of week" class="text-center">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all" [ngClass]="{
+                                        'bg-green-500 text-white shadow-md': d.status === 'completed',
+                                        'bg-amber-400 text-white shadow-md': d.status === 'partial',
+                                        'bg-red-100 text-red-500': d.status === 'missed',
+                                        'bg-slate-100 text-slate-300': d.status === 'future' || d.status === 'none'
+                                    }">
+                                        <span class="text-xs font-bold">{{ d.day }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

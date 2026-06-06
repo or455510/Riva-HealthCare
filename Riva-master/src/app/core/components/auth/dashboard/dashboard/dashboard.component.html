@@ -1,0 +1,139 @@
+<div class="flex h-screen bg-[#f0f9ff] overflow-hidden font-sans">
+
+    <app-sidebar></app-sidebar>
+
+    <div class="flex-1 flex flex-col overflow-hidden md:pl-20">
+
+        <header class="h-20 bg-[#f0f9ff] flex justify-between items-center px-8 shrink-0">
+            <div>
+                <h1 class="text-xl font-extrabold text-slate-800">Doctor Dashboard</h1>
+                <p class="text-xs text-slate-400">Welcome back, {{ currentDoctor.name }}</p>
+            </div>
+
+            <div class="flex items-center gap-3 bg-white p-1.5 pr-4 rounded-2xl shadow-sm border border-blue-50">
+                <button routerLink="/notifications" class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <app-logout-button></app-logout-button>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-700 leading-3">{{ currentDoctor.name }}</p>
+                    <span class="text-[9px] text-green-500 font-bold uppercase">● {{ currentDoctor.status }}</span>
+                </div>
+                <img [src]="currentDoctor.avatar" class="w-9 h-9 rounded-full object-cover">
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto px-8 pb-8 space-y-6">
+
+            <div class="bg-white p-6 rounded-[2.5rem] border border-sky-100 shadow-sm">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-base font-bold text-slate-800">
+                        Patient Follow Requests
+                        <span *ngIf="pendingRequests.length > 0" class="ml-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                            {{ pendingRequests.length }}
+                        </span>
+                    </h2>
+                </div>
+
+                <div *ngIf="isLoadingRequests" class="space-y-3">
+                    <div *ngFor="let i of [1,2]" class="flex items-center gap-4 animate-pulse">
+                        <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+                        <div class="flex-1 h-4 bg-slate-100 rounded"></div>
+                    </div>
+                </div>
+
+                <div *ngIf="!isLoadingRequests && pendingRequests.length === 0" class="text-center py-8 text-slate-400 text-sm">
+                    <i class="fa-solid fa-user-check text-3xl mb-2 block text-slate-200"></i> No pending requests
+                </div>
+
+                <div *ngIf="pendingRequests.length > 0" class="space-y-3">
+                    <div *ngFor="let req of pendingRequests" class="flex items-center gap-4 p-3 bg-sky-50/50 rounded-2xl border border-sky-100">
+                        <img [src]="req.avatar" class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-slate-800">{{ req.name }}</p>
+                            <p class="text-xs text-slate-400">{{ req.condition }} · {{ req.requestedAt }}</p>
+                        </div>
+                        <button (click)="acceptRequest(req)" [disabled]="req.isProcessing" class="px-4 py-2 bg-green-500 text-white text-[11px] font-black rounded-xl hover:bg-green-600 transition-colors">
+                            {{ req.isProcessing ? 'Accepting...' : 'Accept' }}
+                        </button>
+                        <button (click)="rejectRequest(req)" [disabled]="req.isProcessing" class="px-4 py-2 bg-red-100 text-red-500 text-[11px] font-black rounded-xl hover:bg-red-200 transition-colors">
+                            {{ req.isProcessing ? 'Rejecting...' : 'Reject' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <div class="lg:col-span-8 bg-white p-6 rounded-[2.5rem] border border-sky-100 shadow-sm">
+                    <div class="flex justify-between mb-6">
+                        <h2 class="text-lg font-bold text-slate-800">My Patients</h2>
+                        <span class="text-xs text-slate-400">{{ patients.length }} total</span>
+                    </div>
+
+                    <div *ngFor="let patient of patients" (click)="router.navigate(['/chat', patient.userId])" class="flex items-center justify-between p-3 hover:bg-sky-50 rounded-2xl cursor-pointer transition-all">
+                        <div class="flex items-center gap-4">
+                            <span class="w-2 h-2 rounded-full" [class.bg-rose-500]="patient.status==='Critical'" [class.bg-orange-400]="patient.status==='Attention'" [class.bg-green-500]="patient.status==='Stable'"></span>
+                            <img [src]="patient.img" class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-700">{{ patient.name }}</h3>
+                                <p class="text-xs text-slate-400">{{ patient.condition }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-bold text-slate-500">Room {{ patient.room }}</p>
+                            <p class="text-[9px] font-black uppercase" [class.text-sky-600]="patient.status==='Stable'">{{ patient.status }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 bg-gradient-to-b from-sky-50/50 to-white p-6 rounded-[2.5rem] border border-sky-100 flex flex-col items-center shadow-sm gap-4">
+                    <div
+                        class="bg-sky-50 rounded-[30px] h-[200px] relative overflow-hidden shadow-sm border border-sky-100 w-full cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sky-100"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Open Riva AI Assistant"
+                        (click)="openAiAssistant()"
+                        (keydown.enter)="openAiAssistant()"
+                        (keydown.space)="$event.preventDefault(); openAiAssistant()">
+                        <div class="absolute top-4 left-4 bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-sm z-10">
+                            <p class="text-sky-600 font-bold text-sm">Hey! I'm Riva 👋</p>
+                        </div>
+                        <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" class="w-full h-full"></spline-viewer>
+                    </div>
+                    <h3 class="text-sm font-black text-slate-800">Medical AI Assistant</h3>
+                    <div class="w-full space-y-2">
+                        <button class="w-full bg-white p-3 rounded-xl text-xs font-bold text-sky-500 shadow-sm border border-sky-50 flex items-center gap-3 hover:bg-sky-50 transition-colors">
+                            <i class="fa-solid fa-chart-area"></i> Analyze Patient Trends
+                        </button>
+                        <button class="w-full bg-white p-3 rounded-xl text-xs font-bold text-orange-500 shadow-sm border border-sky-50 flex items-center gap-3 hover:bg-orange-50 transition-colors">
+                            <i class="fa-solid fa-circle-exclamation"></i> Risk Assessment
+                        </button>
+                        <button class="w-full bg-white p-3 rounded-xl text-xs font-bold text-green-500 shadow-sm border border-sky-50 flex items-center gap-3 hover:bg-green-50 transition-colors">
+                            <span>💊</span> Drug Interactions
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 bg-white p-6 rounded-[2.5rem] border border-sky-100 shadow-sm">
+                    <h2 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest text-center">Patient Status</h2>
+                    <div *ngIf="!hasPatientAnalytics" class="h-[280px] flex flex-col items-center justify-center text-slate-400 text-sm">
+                        <i class="fa-solid fa-chart-pie text-3xl mb-3 text-slate-200"></i>
+                        No patient data available yet.
+                    </div>
+                    <apx-chart *ngIf="hasPatientAnalytics" [series]="pieOptions.series" [chart]="pieOptions.chart" [labels]="pieOptions.labels" [colors]="pieOptions.colors" [responsive]="pieOptions.responsive"></apx-chart>
+                </div>
+
+                <div class="lg:col-span-6 bg-white p-6 rounded-[2.5rem] border border-sky-100 shadow-sm">
+                    <h2 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest text-center">Weekly Patients</h2>
+                    <div *ngIf="!hasPatientAnalytics" class="h-[280px] flex flex-col items-center justify-center text-slate-400 text-sm">
+                        <i class="fa-solid fa-chart-line text-3xl mb-3 text-slate-200"></i>
+                        No patient data available yet.
+                    </div>
+                    <apx-chart *ngIf="hasPatientAnalytics" [series]="lineOptions.series" [chart]="lineOptions.chart" [xaxis]="lineOptions.xaxis" [stroke]="lineOptions.stroke" [colors]="lineOptions.colors"></apx-chart>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="flex min-h-screen bg-[#f8fafc] font-sans">
+    <app-sidebar></app-sidebar>
+    <!-- <aside class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div class="text-blue-600 font-bold text-xl">
+            <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12 cursor-pointer">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/dashboard-p">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/add-new-medication">
+                <i class="fas fa-pills"></i>
+            </button>
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/doctor-cards">
+                <i class="fa-solid fa-user-doctor"></i>
+            </button>
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/chat">
+                <i class="fa-brands fa-rocketchat"></i>
+            </button>
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/myprofile">
+                <i class="fa-solid fa-circle-user"></i>
+            </button>
+            <button class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" routerLink="/caregiver-cards">
+                <i class="fa-solid fa-user-nurse"></i>
+            </button>
+            <button class="p-2 bg-blue-50 text-blue-600 rounded-lg transition-colors" routerLink="/notifications">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+        </div>
+    </aside> -->
+
+    <main class="flex-1 p-8 md:pl-28">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-[#1e293b]">Notifications</h1>
+                <p class="text-gray-500 mt-1">
+                    Manage your updates and reminders
+                    <span *ngIf="unreadCount > 0" class="ml-2 bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {{ unreadCount }} unread
+                    </span>
+                </p>
+            </div>
+            <button (click)="markAllAsRead()" class="bg-[#1d4ed8] text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md">
+                MARK ALL READ
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+
+        <div *ngIf="!isLoading" class="flex flex-col lg:flex-row gap-6">
+
+            <!-- Notifications List -->
+            <div class="flex-grow bg-white rounded-[40px] p-8 shadow-sm border border-gray-100">
+
+                <!-- Empty State -->
+                <div *ngIf="filteredNotifications.length === 0" class="flex flex-col items-center justify-center py-16 text-gray-400">
+                    <i class="fa-regular fa-bell text-5xl mb-4 text-gray-200"></i>
+                    <p class="font-semibold text-lg">No notifications yet</p>
+                </div>
+
+                <div class="space-y-2">
+                    <div *ngFor="let note of filteredNotifications" (click)="markAsRead(note)" class="flex items-center justify-between py-5 px-4 rounded-2xl transition-colors cursor-pointer" [ngClass]="note.read_at ? 'hover:bg-gray-50 opacity-60' : 'hover:bg-blue-50 bg-blue-50/30'">
+
+                        <div class="flex items-center gap-4">
+                            <div [class]="note.iconBg + ' w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm'">
+                                <i class="fas" [ngClass]="{
+                                    'fa-bell':    note.type === 'medication',
+                                    'fa-search':  note.type === 'test',
+                                    'fa-user-md': note.type === 'doctor',
+                                    'fa-info':    note.type === 'general'
+                                }"></i>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-[#1e293b] text-base">{{ note.title }}</span>
+                                <span *ngIf="!note.read_at" class="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full align-middle"></span>
+                                <p *ngIf="note.body" class="text-sm text-slate-500 mt-1 line-clamp-2">{{ note.body }}</p>
+                                <span class="inline-flex mt-2 text-[10px] font-black uppercase tracking-wider text-slate-400">{{ note.category }}</span>
+                            </div>
+                        </div>
+                        <span class="text-gray-400 font-medium text-sm whitespace-nowrap ml-4">{{ note.time }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:w-80 space-y-6">
+
+                <!-- Overall Toggle -->
+                <div class="bg-white rounded-[30px] p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-[#1e293b] text-lg">Overall Notifications</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   class="sr-only peer"
+                                   [(ngModel)]="overallEnabled"
+                                   [ngModelOptions]="{standalone: true}">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer
+                                        peer-checked:after:translate-x-full peer-checked:after:border-white
+                                        after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+                                        after:bg-white after:border-gray-300 after:border after:rounded-full
+                                        after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="bg-white rounded-[30px] p-8 shadow-sm border border-gray-100">
+                    <div class="space-y-4 mb-8">
+
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" [(ngModel)]="categoryFilters['Medication']" [ngModelOptions]="{standalone: true}">
+                            <span class="text-lg font-medium text-[#1e293b]">Medication</span>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" [(ngModel)]="categoryFilters['Tests']" [ngModelOptions]="{standalone: true}">
+                            <span class="text-lg font-medium text-[#1e293b]">Tests</span>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" [(ngModel)]="categoryFilters['Messages']" [ngModelOptions]="{standalone: true}">
+                            <span class="text-lg font-medium text-[#1e293b]">Messages</span>
+                        </div>
+
+                    </div>
+
+                    <button (click)="markAllAsRead()" class="w-full bg-[#9333ea] text-white py-3 rounded-2xl font-bold uppercase tracking-wider hover:bg-purple-700 transition-all shadow-lg">
+                        Mark all as read
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>

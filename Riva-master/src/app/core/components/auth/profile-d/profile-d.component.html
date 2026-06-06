@@ -1,0 +1,242 @@
+<div class="min-h-screen bg-[#F8F9FB] font-sans flex">
+    <app-sidebar></app-sidebar>
+
+    <!-- ══════════════════ SIDEBAR ══════════════════ -->
+    <aside *ngIf="false" class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div>
+            <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12 hover:scale-105 transition-transform cursor-pointer">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/dashboard-p">
+        <i class="fas fa-home"></i>
+      </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/add-new-medication">
+        <i class="fas fa-pills"></i>
+      </button>
+            <button class="p-2 bg-blue-50 text-blue-600 rounded-lg" routerLink="/doctor-cards">
+        <i class="fa-solid fa-user-doctor"></i>
+      </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/chat">
+        <i class="fa-brands fa-rocketchat"></i>
+      </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/booking">
+        <i class="fa-solid fa-calendar"></i>
+      </button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/myprofile">
+        <i class="fa-solid fa-circle-user"></i>
+      </button>
+        </div>
+    </aside>
+
+    <!-- ══════════════════ CONTENT ══════════════════ -->
+    <div class="flex-1 md:ml-20">
+
+        <!-- LOADING -->
+        <div *ngIf="isLoading" class="flex items-center justify-center min-h-screen">
+            <div class="flex flex-col items-center gap-3">
+                <svg class="animate-spin h-10 w-10 text-[#2D5BFF]" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+                <p class="text-sm text-gray-400 font-medium">Loading doctor profile...</p>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading" class="max-w-3xl mx-auto px-4 py-10 space-y-5">
+
+            <!-- ── Back ── -->
+            <button type="button" (click)="goBack()" class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#2D5BFF] transition-colors">
+        <i class="fa-solid fa-arrow-left text-xs"></i> Back to Doctors
+      </button>
+
+            <!-- ── Alerts ── -->
+            <div *ngIf="errorMessage" class="px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+                {{ errorMessage }}
+            </div>
+            <div *ngIf="successMessage" class="px-4 py-3 bg-green-50 border border-green-100 rounded-2xl text-sm text-green-600 font-medium">
+                {{ successMessage }}
+            </div>
+
+            <!-- ══════ HERO CARD ══════ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+
+                <!-- Cover -->
+                <div class="h-24 bg-gradient-to-r from-[#E6F0FF] to-[#D1E4FF]"></div>
+
+                <div class="px-6 pb-6">
+
+                    <!-- Avatar + Follow -->
+                    <div class="flex items-end justify-between -mt-12 mb-4">
+
+                        <!-- Avatar: صورة لو موجودة، أحرف لو مش موجودة -->
+                        <img *ngIf="doctorAvatar" [src]="doctorAvatar" class="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-md" alt="Doctor" (error)="doctorAvatar = ''">
+                        <div *ngIf="!doctorAvatar" class="w-24 h-24 rounded-2xl border-4 border-white shadow-md bg-blue-100 flex items-center justify-center text-[#2D5BFF] font-black text-3xl">
+                            {{ doctorName.charAt(0).toUpperCase() }}
+                        </div>
+
+                        <!-- Follow Button -->
+                        <button type="button" (click)="toggleFollow()" [disabled]="isFollowing || isSubmittingFollow" class="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all border" [ngClass]="isFollowing
+                      ? 'bg-white text-[#2D5BFF] border-[#2D5BFF] opacity-70 cursor-default'
+                      : 'bg-[#2D5BFF] text-white border-[#2D5BFF] hover:bg-[#1A4BFF] shadow-lg shadow-blue-100'">
+              <svg *ngIf="isSubmittingFollow" class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <i *ngIf="!isSubmittingFollow" class="fa-solid"
+                 [ngClass]="isFollowing ? 'fa-user-check' : 'fa-user-plus'"></i>
+              {{ isFollowing ? 'Following' : isSubmittingFollow ? 'Sending...' : 'Follow' }}
+            </button>
+                    </div>
+                    <button type="button" (click)="bookConsultation()" class="w-full mb-5 bg-[#00A6A6] hover:bg-teal-700 text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-teal-100 transition-all">
+                        <i class="fa-solid fa-calendar-check mr-2"></i>Book Consultation
+                    </button>
+
+                    <!-- Name + specialty badge -->
+                    <div class="flex items-center gap-3 flex-wrap mb-3">
+                        <h1 class="text-xl font-bold text-[#1A2D51]">Dr. {{ doctorName }}</h1>
+                        <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
+              🩺 {{ specialty || 'Doctor' }}
+            </span>
+                    </div>
+
+                    <!-- Contact info -->
+                    <div class="space-y-1.5 mb-5">
+                        <p *ngIf="doctorEmail" class="text-sm text-gray-500 flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-blue-300 text-xs w-4"></i> {{ doctorEmail }}
+                        </p>
+                        <p *ngIf="doctorPhone" class="text-sm text-gray-500 flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-blue-300 text-xs w-4"></i> {{ doctorPhone }}
+                        </p>
+                        <p *ngIf="clinicAddress" class="text-sm text-gray-500 flex items-center gap-2">
+                            <i class="fa-solid fa-location-dot text-blue-300 text-xs w-4"></i> {{ clinicAddress }}
+                        </p>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">
+                                {{ experienceYears !== null ? experienceYears : '—' }}
+                            </p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Years Exp.</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">
+                                {{ fee !== null ? (fee + ' EGP') : '—' }}
+                            </p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Consultation</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+                            <p class="text-xl font-black text-[#1A2D51]">
+                                {{ averageRating > 0 ? averageRating : '—' }}
+                            </p>
+                            <p class="text-[11px] text-gray-400 font-semibold mt-0.5">Avg. Rating</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════ ABOUT ══════ -->
+            <div *ngIf="about" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-3">About</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ about }}</p>
+            </div>
+
+            <!-- ══════ AVAILABLE DAYS ══════ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-4">Available Days</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span *ngFor="let day of allDays" class="px-4 py-2 rounded-xl text-[12px] font-bold border transition-all" [ngClass]="isDayAvailable(day)
+                  ? 'bg-[#2D5BFF] text-white border-[#2D5BFF]'
+                  : 'bg-gray-50 text-gray-300 border-gray-100'">
+            {{ day.slice(0,3) }}
+          </span>
+                </div>
+            </div>
+
+            <!-- ══════ REVIEWS ══════ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 space-y-5">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[13px] font-bold text-gray-400 uppercase tracking-wider">Patient Reviews</h3>
+                    <div *ngIf="totalReviews > 0" class="flex items-center gap-2">
+                        <div class="flex gap-0.5">
+                            <i *ngFor="let s of getStars(averageRating)" class="fa-star text-sm" [ngClass]="s ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-200'"></i>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700">{{ averageRating }}</span>
+                        <span class="text-xs text-gray-400">({{ totalReviews }})</span>
+                    </div>
+                </div>
+
+                <!-- Review cards -->
+                <div *ngIf="reviews.length > 0" class="space-y-4">
+                    <div *ngFor="let review of reviews" class="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <!-- Avatar initials -->
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-[#2D5BFF] font-black text-sm shrink-0">
+                            {{ review.patientName.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <p class="text-sm font-bold text-gray-700">{{ review.patientName }}</p>
+                                <span class="text-[11px] text-gray-400">{{ review.date }}</span>
+                            </div>
+                            <div class="flex gap-0.5 my-1">
+                                <i *ngFor="let s of getStars(review.rating)" class="fa-star text-xs" [ngClass]="s ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-200'"></i>
+                            </div>
+                            <p class="text-sm text-gray-500 leading-relaxed">{{ review.comment }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty -->
+                <div *ngIf="reviews.length === 0" class="text-center py-8 text-gray-400">
+                    <i class="fa-regular fa-star text-3xl mb-2 block text-gray-200"></i>
+                    <p class="text-sm font-medium">No reviews yet. Be the first!</p>
+                </div>
+
+                <!-- ── Write Review ── -->
+                <div class="border-t border-gray-100 pt-5 space-y-4">
+                    <h4 class="text-[13px] font-bold text-gray-700">Write a Review</h4>
+
+                    <!-- Stars picker -->
+                    <div class="flex items-center gap-1">
+                        <button *ngFor="let star of [1,2,3,4,5]" type="button" (click)="setRating(star)" (mouseenter)="hoverStar(star)" (mouseleave)="clearHover()" class="text-2xl transition-transform hover:scale-110">
+              <i class="fa-star"
+                 [ngClass]="star <= (hoveredStar || newRating)
+                   ? 'fa-solid text-yellow-400'
+                   : 'fa-regular text-gray-300'"></i>
+            </button>
+                        <span class="text-xs text-gray-400 ml-2 font-medium">
+              {{
+                newRating === 1 ? 'Poor'      :
+                newRating === 2 ? 'Fair'      :
+                newRating === 3 ? 'Good'      :
+                newRating === 4 ? 'Very Good' :
+                newRating === 5 ? 'Excellent' :
+                'Select rating'
+              }}
+            </span>
+                    </div>
+
+                    <!-- Comment -->
+                    <textarea [(ngModel)]="newComment" rows="3" placeholder="Share your experience with this doctor..." class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm resize-none">
+          </textarea>
+
+                    <!-- Submit -->
+                    <button type="button" (click)="submitReview()" [disabled]="isSubmittingReview" class="w-full bg-[#2D5BFF] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1A4BFF] transition-all disabled:opacity-60 flex items-center justify-center gap-2 active:scale-95">
+            <svg *ngIf="isSubmittingReview" class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            {{ isSubmittingReview ? 'Submitting...' : 'Submit Review' }}
+          </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

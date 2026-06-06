@@ -1,0 +1,84 @@
+<!-- container -->
+<div class="min-h-screen w-full bg-[#F8F9FB] font-sans flex">
+    <!-- left-section -->
+    <div class="hidden md:flex w-1/2 relative overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#DDEBFF] to-[#BFD6FF]"></div>
+        <!-- Floating Icons -->
+        <div class="absolute top-16 left-20 bg-white/60 backdrop-blur-md p-3 rounded-2xl shadow-md"> <i class="fa-solid fa-bell text-[green] text-xl"></i> </div>
+        <div class="absolute top-1/3 right-20 bg-white/60 backdrop-blur-md p-3 rounded-2xl shadow-md"> <i class="fa-solid fa-heart text-[#2D5BFF] text-xl"></i> </div>
+        <div class="absolute bottom-32 left-32 bg-white/60 backdrop-blur-md p-3 rounded-2xl shadow-md"> <i class="fa-solid fa-stethoscope text-[orange] text-xl"></i> </div>
+        <!-- Content -->
+        <div class="relative z-10 flex flex-col items-center justify-center w-full p-10">
+            <!-- Spline -->
+            <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" class="w-full h-full md:scale-100 scale-125 transition-transform duration-500"> </spline-viewer>
+            <!-- Welcome Text -->
+            <div class="text-center mt-10">
+                <h2 class="text-[#1A4BFF] text-3xl font-bold"> Welcome to Riva </h2>
+                <p class="text-[#4A6FAF] text-sm mt-3"> Your trusted healthcare companion </p>
+            </div>
+            <!-- ✅ ERROR MESSAGE (Floating Box فوق كل حاجة) -->
+            <div *ngIf="errorMessage" class="absolute top-10 left-1/2 -translate-x-1/2 z-50">
+                <div class="bg-white border-l-4 border-red-500 text-red-600 px-6 py-4 rounded-2xl shadow-2xl text-sm font-semibold backdrop-blur-md animate-bounce"> {{ errorMessage }} </div>
+            </div>
+        </div>
+    </div>
+    <!-- right-section -->
+    <div class="w-full md:w-1/2 flex flex-col bg-white p-8 md:px-12 overflow-y-auto">
+        <!-- logo-mobile -->
+        <div class="md:hidden flex flex-col items-center mb-4"> <img src="/Picture1.png" class="w-12 h-12 object-contain" alt="Logo"> <span class="text-lg font-black text-[#1A2D51] tracking-widest uppercase"> RIVA </span> </div>
+        <!-- header -->
+        <div class="text-center mb-6">
+            <!-- logo-desktop -->
+            <div class="hidden md:flex flex-col items-center"> <img src="/Picture1.png" class="w-25 h-25 object-contain" alt="Logo"> <span class="text-xl font-black text-[#1A2D51] tracking-widest mt-1 uppercase"> RIVA </span> </div>
+            <!-- title -->
+            <h1 class="text-2xl md:text-3xl font-bold text-[#1A2D51] mt-2 md:mt-4"> Sign In </h1>
+            <!-- subtitle -->
+            <p class="text-gray-400 text-[12px] mt-1 font-medium"> Access your healthcare dashboard </p>
+        </div>
+        <!-- FORM -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full max-w-[320px] mx-auto space-y-4">
+            <!-- email-input -->
+            <div class="space-y-1"> <label class="text-[12px] font-semibold text-gray-700 ml-1"> Phone Number or Email </label>
+                <div class="relative w-full"> <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-blue-400"></i> <input type="text" formControlName="email" placeholder="Enter your phone or email" class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-400 text-sm outline-none transition-all">                    </div>
+            </div>
+            <!-- password-input -->
+            <!-- password-input -->
+            <div class="space-y-1 anim-field-2">
+                <label class="text-[12px] font-semibold text-gray-700 ml-1">Password</label>
+                <div class="relative">
+                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Password" class="w-full pl-4 pr-11 py-3 bg-gray-50 border border-gray-100 rounded-xl
+             focus:ring-2 focus:ring-blue-100 focus:border-blue-400
+             text-sm outline-none transition-all">
+
+                    <button type="button" (click)="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2
+             text-gray-400 hover:text-[#2D5BFF] active:scale-90
+             transition-all duration-200 ease-out
+             focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+      <i class="fa-solid transition-all duration-200"
+         [class.fa-eye]="!showPassword"
+         [class.fa-eye-slash]="showPassword"
+         [class.text-[#2D5BFF]]="showPassword"
+         [class.text-gray-400]="!showPassword">
+      </i>
+    </button>
+                </div>
+            </div>
+            <!-- submit-button --><button type="submit" class="w-full bg-[#2D5BFF] text-white py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-[#1A4BFF] transition-all flex items-center justify-center group"> Login  <span class="ml-2 group-hover:translate-x-1 transition-transform"> → </span> </button>
+            <!-- Forget Password -->
+            <div class="text-center text-sm"> <a class="navbar-brand mt-2 mt-lg-0" href="/forget-password" style="color: #2D5BFF; font-weight: 600;"> Forget Password? </a> </div>
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-4">
+                <div class="flex-grow border-t border-gray-200"></div> <span class="text-gray-400 text-[10px] uppercase font-bold tracking-widest"> or </span>
+                <div class="flex-grow border-t border-gray-200"></div>
+            </div>
+            <!-- google-button --><button type="button" (click)="loginWithGoogle()" class="w-full border border-gray-100 py-3 rounded-xl font-semibold text-[13px] text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center"> <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4 mr-2" alt="google"> Google account </button>
+            <!-- footer -->
+            <div class="text-center mt-4">
+                <p class="text-[11px] text-gray-400 italic"> "Welcome back, we are here to take care of you" </p>
+                <!-- register-link -->
+                <p class="text-[13px] mt-4 text-gray-600"> Don't have an account? <a href="/signup" class="text-[#2D5BFF] font-bold hover:underline"> Create Account </a> </p>
+            </div>
+        </form>
+    </div>
+</div>

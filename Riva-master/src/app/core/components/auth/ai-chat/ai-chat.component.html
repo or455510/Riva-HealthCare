@@ -1,0 +1,100 @@
+<div class="ai-chat-page ai-shell">
+  <app-sidebar></app-sidebar>
+
+  <main class="ai-main">
+    <header class="ai-header">
+      <div>
+        <p class="eyebrow">Riva Platform</p>
+        <h1>Riva AI Assistant</h1>
+        <p class="subtitle">General health guidance, care preparation, and platform support.</p>
+      </div>
+
+      <button type="button" class="clear-button" (click)="clearChat()">
+        <i class="fa-solid fa-rotate-left"></i>
+        Clear
+      </button>
+    </header>
+
+    <section class="safety-note" aria-label="Medical safety note">
+      <i class="fa-solid fa-shield-heart"></i>
+      <p>
+        Riva AI Assistant provides general guidance and platform support only. It does not provide diagnosis,
+        treatment decisions, or emergency medical advice.
+      </p>
+    </section>
+
+    <section class="chat-layout">
+      <aside class="persona-panel" aria-label="Assistant focus">
+        <div class="robot-card">
+          <img [src]="selectedPersona.avatar" [alt]="selectedPersona.name" />
+          <div>
+            <span>Active Assistant</span>
+            <strong>{{ selectedPersona.name }}</strong>
+            <small>{{ selectedPersona.specialty }}</small>
+          </div>
+        </div>
+
+        <div class="persona-list">
+          <button
+            type="button"
+            *ngFor="let persona of personas; trackBy: trackPersona"
+            class="persona-button"
+            [class.active]="persona.id === selectedPersona.id"
+            (click)="selectPersona(persona)">
+            <img [src]="persona.avatar" [alt]="persona.name" />
+            <span>
+              <strong>{{ persona.name }}</strong>
+              <small>{{ persona.specialty }}</small>
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      <section class="conversation-card chat-card">
+        <div class="conversation-top">
+          <div>
+            <h2>{{ selectedPersona.name }}</h2>
+            <p>{{ selectedPersona.welcome }}</p>
+          </div>
+          <span class="status-pill">
+            <i class="fa-solid fa-circle"></i>
+            Ready
+          </span>
+        </div>
+
+        <div #messagesPanel class="messages-panel messages" aria-live="polite">
+          <article
+            *ngFor="let message of messages; trackBy: trackMessage"
+            class="message"
+            [class.user-message]="message.role === 'user'"
+            [class.assistant-message]="message.role === 'assistant'">
+            <div class="bubble">
+              <p>{{ message.text }}</p>
+              <time>{{ message.time | date:'shortTime' }}</time>
+            </div>
+          </article>
+
+          <article *ngIf="isSending" class="message assistant-message">
+            <div class="bubble typing">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </article>
+        </div>
+
+        <form class="composer" (ngSubmit)="sendMessage()">
+          <textarea
+            name="message"
+            [(ngModel)]="draft"
+            (keydown)="onComposerKeydown($event)"
+            placeholder="Ask Riva AI Assistant..."
+            rows="1"></textarea>
+          <button type="submit" [disabled]="!draft.trim() || isSending" aria-label="Send message">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </section>
+    </section>
+  </main>
+</div>

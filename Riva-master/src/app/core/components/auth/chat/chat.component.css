@@ -1,0 +1,49 @@
+.app-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+app-sidebar {
+    flex-shrink: 0;
+}
+
+app-chat-list {
+    flex-shrink: 0;
+}
+
+app-chat-window {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* في ملف styles.css أو المكون الأب */
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #F8FAFC;
+    /* لون الخلفية الهادئ من Figma */
+    padding-left: 75px;
+    /* مساحة للـ Sidebar الثابت */
+    overflow: hidden;
+}
+
+app-chat-list {
+    width: 350px;
+    /* عرض قائمة المحادثات */
+    height: 100%;
+    background: white;
+    border-right: 1px solid #f0f0f0;
+}
+
+app-chat-window {
+    flex: 1;
+    /* يأخذ باقي المساحة */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}

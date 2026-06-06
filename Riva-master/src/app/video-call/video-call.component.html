@@ -1,0 +1,63 @@
+<div class="call-wrap">
+
+    <!-- Incoming Call -->
+    <div *ngIf="incomingCall" class="incoming-overlay">
+        <div class="incoming-card">
+            <div class="avatar">👤</div>
+            <p>{{ incomingCall.type === 'voice' ? 'Incoming voice call...' : 'Incoming video call...' }}</p>
+            <div class="incoming-actions">
+                <button (click)="acceptCall()" class="btn-accept">
+                    <span>{{ incomingCall.type === 'voice' ? '📞' : '📹' }}</span> Accept
+                </button>
+                <button (click)="rejectCall()" class="btn-reject">
+                    <span>📵</span> Decline
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Screen -->
+    <div *ngIf="callState === 'in-call' || callState === 'calling'" class="video-area">
+
+        <!-- Remote Video (hidden in Voice) -->
+        <video #remoteVideo autoplay playsinline class="remote-video" [style.display]="callType === 'voice' ? 'none' : 'block'"></video>
+
+        <!-- Voice Only Placeholder -->
+        <div *ngIf="callType === 'voice' && callState === 'in-call'" class="voice-active">
+            <div class="voice-avatar">🎙️</div>
+            <p class="voice-label">Call in progress...</p>
+        </div>
+
+        <!-- Local Video (hidden in Voice) -->
+        <video #localVideo autoplay playsinline muted class="local-video" [style.display]="callType === 'voice' ? 'none' : 'block'"></video>
+
+        <!-- Connecting State -->
+        <div *ngIf="callState === 'calling'" class="connecting-overlay">
+            <div class="connecting-spinner"></div>
+            <p>Connecting...</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button (click)="toggleMic()" class="ctrl-btn" [class.off]="isMuted">
+                {{ isMuted ? '🔇' : '🎙️' }}
+            </button>
+
+            <button (click)="endCall()" class="ctrl-btn btn-end">
+                📵
+            </button>
+
+            <!-- Camera button hidden in Voice -->
+            <button *ngIf="callType === 'video'" (click)="toggleCam()" class="ctrl-btn" [class.off]="isCameraOff">
+                {{ isCameraOff ? '🚫' : '📷' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Start Call Button -->
+    <button *ngIf="callState === 'idle'" (click)="startCall()" class="btn-start-call">
+        <span>{{ callType === 'voice' ? '📞' : '📹' }}</span>
+        <span>{{ callType === 'voice' ? 'Voice Call' : 'Video Call' }}</span>
+    </button>
+
+</div>
