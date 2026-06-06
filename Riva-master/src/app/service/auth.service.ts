@@ -40,7 +40,7 @@
 // export class AuthService {
 //   [x: string]: any;
 //   private readonly authUrl = `${API_BASE_URL}/auth`;
-// private apiUrl = 'http://127.0.0.1:8000/api';
+// private apiUrl = 'http://https://riva-healthcare-tm.gamer.gd/api';
 //   private get isBrowser(): boolean {
 //     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 //   }

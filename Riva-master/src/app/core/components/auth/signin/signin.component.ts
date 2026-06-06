@@ -87,7 +87,7 @@ export class SigninComponent implements OnInit {
           console.error('LOGIN ERROR:', error);
 
           if (error.status === 0) {
-            this.errorMessage = 'Cannot connect to server. Make sure Laravel is running on http://127.0.0.1:8000';
+            this.errorMessage = 'Cannot connect to server. Make sure Laravel is running on http://https://riva-healthcare-tm.gamer.gd';
           } else if (error.status === 401) {
             this.errorMessage = 'Email or password is invalid.';
           } else if (error.status === 422) {

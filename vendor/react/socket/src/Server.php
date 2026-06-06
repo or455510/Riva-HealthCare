@@ -23,15 +23,15 @@ final class Server extends EventEmitter implements ServerInterface
      * ```php
      * // deprecated
      * $socket = new React\Socket\Server(0);
-     * $socket = new React\Socket\Server('127.0.0.1:8000');
-     * $socket = new React\Socket\Server('127.0.0.1:8000', null, $context);
-     * $socket = new React\Socket\Server('127.0.0.1:8000', $loop, $context);
+     * $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd');
+     * $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd', null, $context);
+     * $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd', $loop, $context);
      *
      * // new
      * $socket = new React\Socket\SocketServer('127.0.0.1:0');
-     * $socket = new React\Socket\SocketServer('127.0.0.1:8000');
-     * $socket = new React\Socket\SocketServer('127.0.0.1:8000', $context);
-     * $socket = new React\Socket\SocketServer('127.0.0.1:8000', $context, $loop);
+     * $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd');
+     * $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd', $context);
+     * $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd', $context, $loop);
      * ```
      *
      * This class takes an optional `LoopInterface|null $loop` parameter that can be used to

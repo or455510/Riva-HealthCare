@@ -74,7 +74,7 @@ export class DashboardCaregiverComponent implements OnInit {
         const user = res.user || res;
         this.currentCaregiver.name   = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Caregiver';
         this.currentCaregiver.avatar = user.profile_image_url
-          || (user.profile_image ? `http://127.0.0.1:8000/storage/${user.profile_image}` : null)
+          || (user.profile_image ? `http://https://riva-healthcare-tm.gamer.gd/storage/${user.profile_image}` : null)
           || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentCaregiver.name)}&background=F5F0FF&color=7C3AED`;
       },
       error: () => {}
@@ -118,7 +118,7 @@ loadAcceptedPatients(): void {
           id:        r.patient_id || patient.id,
           name,
           img: user.profile_image_url
-            || (user.profile_image ? `http://127.0.0.1:8000/storage/${user.profile_image}` : null)
+            || (user.profile_image ? `http://https://riva-healthcare-tm.gamer.gd/storage/${user.profile_image}` : null)
             || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F5F0FF&color=7C3AED`,
           condition: patient.chronic_conditions || patient.medical_history || 'N/A',
           status:    r.status === 'active' ? 'Stable' : (r.status || 'Stable'),

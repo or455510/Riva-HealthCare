@@ -115,7 +115,7 @@ export class DashboardPComponent implements OnInit, OnDestroy {
         const roleProfile = res.role_profile || res.data?.role_profile || {};
         this.currentpatient.name   = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Patient';
 this.currentpatient.avatar = user.profile_image_url
-  || (user.profile_image ? `http://127.0.0.1:8000/storage/${user.profile_image}` : null)
+  || (user.profile_image ? `http://https://riva-healthcare-tm.gamer.gd/storage/${user.profile_image}` : null)
   || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentpatient.name)}&background=E0F2FE&color=0EA5E9`;
         this.diseaseMarkers = this.buildDiseaseMarkers(roleProfile?.chronic_conditions);
       },

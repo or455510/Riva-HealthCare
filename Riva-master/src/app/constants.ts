@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://127.0.0.1:8000/api';
+export const API_BASE_URL = 'http://https://riva-healthcare-tm.gamer.gd/api';
 export const STORAGE_BASE_URL = API_BASE_URL.replace('/api', '/storage');
 export const AI_ASSISTANT_ENDPOINT = `${API_BASE_URL}/ai-assistant/message`;
 export const CONTACT_MESSAGE_ENDPOINT = `${API_BASE_URL}/contact-message`;

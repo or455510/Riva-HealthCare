@@ -35,7 +35,7 @@ export interface ChatContact {
   status: 'online' | 'offline';
 }
 
-const STORAGE_BASE = 'http://127.0.0.1:8000/storage/';
+const STORAGE_BASE = 'http://https://riva-healthcare-tm.gamer.gd/storage/';
 
 function toAvatarUrl(user: any, fallback: string): string {
   return user.profile_image_url
@@ -566,8 +566,8 @@ export class ChatCComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     if (cached !== 'loading') {
       const rawPath = fileUrl
-        .replace('http://127.0.0.1:8000/storage/', '')
-        .replace('http://localhost:8000/storage/', '');
+        .replace('http://https://riva-healthcare-tm.gamer.gd/storage/', '')
+        .replace('http://https://riva-healthcare-tm.gamer.gd/storage/', '');
       const apiUrl = `${API_BASE_URL}/files/${rawPath}`;
       const token = this.authService.getToken();
 

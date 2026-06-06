@@ -80,7 +80,7 @@ export class DashboardComponent implements OnInit {
       const user = res.user || res;
       this.currentDoctor.name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Doctor';
       this.currentDoctor.avatar = user.profile_image_url
-        || (user.profile_image ? `http://127.0.0.1:8000/storage/${user.profile_image}` : null)
+        || (user.profile_image ? `http://https://riva-healthcare-tm.gamer.gd/storage/${user.profile_image}` : null)
         || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentDoctor.name)}&background=E0F2FE&color=0EA5E9`;
     });
   }
@@ -124,7 +124,7 @@ loadDoctorPatients(): void {
           userId:    user.id,
           name,
           img: user.profile_image_url
-            || (user.profile_image ? `http://127.0.0.1:8000/storage/${user.profile_image}` : null)
+            || (user.profile_image ? `http://https://riva-healthcare-tm.gamer.gd/storage/${user.profile_image}` : null)
             || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E0F2FE&color=0EA5E9`,
           condition: patient.chronic_conditions || patient.medical_history || 'N/A',
           status:    r.status || 'Stable',

@@ -1,6 +1,6 @@
 # Riva API Endpoints
 
-Base URL: `http://127.0.0.1:8000/api`
+Base URL: `http://https://riva-healthcare-tm.gamer.gd/api`
 
 All authenticated endpoints expect:
 

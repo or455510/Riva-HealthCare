@@ -192,7 +192,7 @@ export class AddNewMedicationComponent implements OnInit {
     }
 
     if (err?.status === 0) {
-      return 'Cannot connect to Riva API. Please start the Laravel backend on http://127.0.0.1:8000 and try again.';
+      return 'Cannot connect to Riva API. Please start the Laravel backend on http://https://riva-healthcare-tm.gamer.gd and try again.';
     }
     if (err?.status === 401) return 'Please log in again before saving medication.';
     if (err?.status === 403) return 'Only patient accounts can save medications.';

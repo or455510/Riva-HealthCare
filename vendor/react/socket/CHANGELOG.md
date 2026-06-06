@@ -130,15 +130,15 @@
     ```php
     // deprecated
     $socket = new React\Socket\Server(0);
-    $socket = new React\Socket\Server('127.0.0.1:8000');
-    $socket = new React\Socket\Server('127.0.0.1:8000', null, $context);
-    $socket = new React\Socket\Server('127.0.0.1:8000', $loop, $context);
+    $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd');
+    $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd', null, $context);
+    $socket = new React\Socket\Server('https://riva-healthcare-tm.gamer.gd', $loop, $context);
 
     // new
     $socket = new React\Socket\SocketServer('127.0.0.1:0');
-    $socket = new React\Socket\SocketServer('127.0.0.1:8000');
-    $socket = new React\Socket\SocketServer('127.0.0.1:8000', $context);
-    $socket = new React\Socket\SocketServer('127.0.0.1:8000', $context, $loop);
+    $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd');
+    $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd', $context);
+    $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd', $context, $loop);
     ```
 
 *   Feature: Update `Connector` signature to take optional `$context` as first argument.

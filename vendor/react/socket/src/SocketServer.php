@@ -15,8 +15,8 @@ final class SocketServer extends EventEmitter implements ServerInterface
      *
      * ```php
      * $socket = new React\Socket\SocketServer('127.0.0.1:0');
-     * $socket = new React\Socket\SocketServer('127.0.0.1:8000');
-     * $socket = new React\Socket\SocketServer('127.0.0.1:8000', $context);
+     * $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd');
+     * $socket = new React\Socket\SocketServer('https://riva-healthcare-tm.gamer.gd', $context);
      * ```
      *
      * This class takes an optional `LoopInterface|null $loop` parameter that can be used to

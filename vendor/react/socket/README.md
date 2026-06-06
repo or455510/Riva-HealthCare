@@ -457,7 +457,7 @@ If your private key is encrypted with a passphrase, you have to specify it
 like this:
 
 ```php
-$socket = new React\Socket\SocketServer('tls://127.0.0.1:8000', array(
+$socket = new React\Socket\SocketServer('tls://https://riva-healthcare-tm.gamer.gd', array(
     'tls' => array(
         'local_cert' => 'server.pem',
         'passphrase' => 'secret'
@@ -470,7 +470,7 @@ SSLv2/SSLv3. As of PHP 5.6+ you can also explicitly choose the TLS version you
 want to negotiate with the remote side:
 
 ```php
-$socket = new React\Socket\SocketServer('tls://127.0.0.1:8000', array(
+$socket = new React\Socket\SocketServer('tls://https://riva-healthcare-tm.gamer.gd', array(
     'tls' => array(
         'local_cert' => 'server.pem',
         'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_SERVER

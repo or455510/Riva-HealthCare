@@ -79,7 +79,7 @@ export class PatientCardsComponent implements OnInit {
   private resolveImageUrl(path: string | null | undefined): string | null {
     if (!path) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    return `http://127.0.0.1:8000/storage/${path}`;
+    return `http://https://riva-healthcare-tm.gamer.gd/storage/${path}`;
   }
 
   loadPatients(): void {
