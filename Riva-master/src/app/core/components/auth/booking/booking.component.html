@@ -1,0 +1,384 @@
+<div class="flex min-h-screen bg-[#f7f8fb] font-sans">
+    <app-sidebar></app-sidebar>
+
+    <main class="flex-1 p-4 sm:p-8 md:pl-28">
+        <div class="mx-auto flex max-w-6xl flex-col gap-6">
+
+            <!-- Header + stepper + alerts: hidden on the final screen for a cleaner finish -->
+            <ng-container *ngIf="currentStep() < 3">
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-blue-600">
+                        {{ isCaregiver ? 'Caregiver booking' : 'Patient booking' }}
+                    </p>
+                    <h1 class="mt-1 text-2xl font-bold text-[#1e293b] sm:text-3xl">
+                        Book a {{ isCaregiver ? 'caregiver' : 'consultation' }}
+                    </h1>
+                    <p class="mt-1 text-sm text-slate-500">
+                        {{ isCaregiver ? 'Choose a care plan, start date and time.' : 'Choose a consultation type, date and time — payment is settled at the clinic, not in this app.' }}
+                    </p>
+                </div>
+
+                <!-- Stepper -->
+                <div class="flex items-center gap-3 rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:gap-4 sm:p-5">
+                    <div class="flex items-center gap-2">
+                        <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold transition-all" [ngClass]="isStepDone(1) ? 'bg-blue-600 text-white' : (isStepActive(1) ? 'border-2 border-blue-600 text-blue-600' : 'border-2 border-slate-200 text-slate-400')">
+                            <i *ngIf="isStepDone(1)" class="fa-solid fa-check text-[10px]"></i>
+                            <span *ngIf="!isStepDone(1)">1</span>
+                        </div>
+                        <span class="hidden text-xs font-bold sm:inline" [ngClass]="isStepActive(1) ? 'text-blue-600' : 'text-slate-400'">
+                            {{ isCaregiver ? 'Care type' : 'Appointment' }}
+                        </span>
+                    </div>
+                    <div class="h-px flex-1 bg-slate-200"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold transition-all" [ngClass]="isStepDone(2) ? 'bg-blue-600 text-white' : (isStepActive(2) ? 'border-2 border-blue-600 text-blue-600' : 'border-2 border-slate-200 text-slate-400')">
+                            <i *ngIf="isStepDone(2)" class="fa-solid fa-check text-[10px]"></i>
+                            <span *ngIf="!isStepDone(2)">2</span>
+                        </div>
+                        <span class="hidden text-xs font-bold sm:inline" [ngClass]="isStepActive(2) ? 'text-blue-600' : 'text-slate-400'">Reservation</span>
+                    </div>
+                    <div class="h-px flex-1 bg-slate-200"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 text-xs font-bold transition-all" [ngClass]="isStepActive(3) ? 'border-blue-600 text-blue-600' : 'border-slate-200 text-slate-400'">
+                            <span>3</span>
+                        </div>
+                        <span class="hidden text-xs font-bold text-slate-400 sm:inline">Confirmed</span>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div *ngIf="errorMessage()" class="rounded-2xl border border-red-100 bg-red-50 px-5 py-3 text-sm font-semibold text-red-600">
+                    <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>{{ errorMessage() }}
+                </div>
+                <div *ngIf="successMessage()" class="rounded-2xl border border-green-100 bg-green-50 px-5 py-3 text-sm font-semibold text-green-700">
+                    <i class="fa-solid fa-circle-check mr-1.5"></i>{{ successMessage() }}
+                </div>
+            </ng-container>
+
+            <!-- ══════════════ STEP 1 — Appointment details ══════════════ -->
+            <div *ngIf="currentStep() === 1" class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_340px]">
+                <div class="flex flex-col gap-6">
+
+                    <!-- Consultation / care type -->
+                    <div class="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                        <label class="mb-5 block text-base font-bold text-[#1e293b]">
+                            {{ isCaregiver ? 'Care type' : 'Consultation type' }}
+                        </label>
+                        <div *ngFor="let opt of consultOptions" (click)="selectedConsultType.set(opt.id)" class="mb-3 flex cursor-pointer items-center justify-between rounded-xl border-2 border-slate-100 p-4 transition-all hover:border-blue-300 hover:bg-blue-50/50" [class.border-purple-500]="isCaregiver && selectedConsultType() === opt.id" [class.bg-purple-50]="isCaregiver && selectedConsultType() === opt.id" [class.border-blue-600]="!isCaregiver && selectedConsultType() === opt.id" [class.bg-blue-50]="!isCaregiver && selectedConsultType() === opt.id">
+                            <div>
+                                <div class="font-bold text-slate-800">{{ opt.label }}</div>
+                                <div class="text-xs text-slate-500">Duration: {{ opt.duration }}</div>
+                            </div>
+                            <div class="text-xl font-extrabold" [ngClass]="isCaregiver ? 'text-purple-600' : 'text-blue-600'">
+                                {{ opt.price }} <span class="text-xs">EGP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar -->
+                    <div class="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                        <div class="mb-5 flex items-center justify-between">
+                            <label class="block text-base font-bold text-[#1e293b]">
+                                {{ isCaregiver ? 'Start date' : 'Appointment date' }}
+                            </label>
+                            <button type="button" (click)="goToToday()" class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition-all hover:bg-blue-100">
+                                Today
+                            </button>
+                        </div>
+                        <div class="select-none">
+                            <div class="mb-5 flex items-center justify-between">
+                                <button class="rounded-lg border border-slate-200 p-2 hover:bg-slate-50" (click)="prevMonth()">
+                                    <i class="fa-solid fa-chevron-left text-xs text-slate-500"></i>
+                                </button>
+                                <div class="text-lg font-bold text-[#1e293b]">{{ calMonthTitle() }}</div>
+                                <button class="rounded-lg border border-slate-200 p-2 hover:bg-slate-50" (click)="nextMonth()">
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-7 gap-2 text-center">
+                                <div *ngFor="let d of DAY_NAMES" class="pb-2 text-xs font-bold text-slate-400">{{ d }}</div>
+                                <button *ngFor="let cell of calendarCells()" (click)="selectDay(cell.day, cell.state)" [disabled]="cell.state === 'disabled' || cell.state === 'empty'" [ngClass]="{
+                    'bg-blue-600 text-white shadow-md':    !isCaregiver && cell.state === 'selected',
+                    'bg-purple-600 text-white shadow-md':  isCaregiver  && cell.state === 'selected',
+                    'text-blue-600 font-bold underline':   cell.state === 'today',
+                    'text-slate-200 cursor-not-allowed':   cell.state === 'disabled',
+                    'hover:bg-blue-50 hover:text-blue-600': !isCaregiver && cell.state !== 'disabled' && cell.state !== 'selected',
+                    'hover:bg-purple-50 hover:text-purple-600': isCaregiver && cell.state !== 'disabled' && cell.state !== 'selected'
+                  }" class="flex aspect-square items-center justify-center rounded-xl font-medium transition-all">
+                  {{ cell.day }}
+                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time slots -->
+                    <div class="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                        <div class="mb-5 flex items-center justify-between">
+                            <span class="text-base font-bold text-[#1e293b]">
+                {{ isCaregiver ? 'Preferred start time' : 'Available time slots' }}
+              </span>
+                            <span class="text-sm font-medium" [ngClass]="isCaregiver ? 'text-purple-600' : 'text-blue-600'">
+                {{ selectedDateLabel() }}
+              </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                            <button *ngFor="let slot of timeSlots" (click)="selectSlot(slot)" [disabled]="slot.disabled" [class.bg-blue-600]="!isCaregiver && selectedSlot() === slot.time" [class.bg-purple-600]="isCaregiver && selectedSlot() === slot.time" [class.text-white]="selectedSlot() === slot.time" [class.border-blue-600]="!isCaregiver && selectedSlot() === slot.time" [class.border-purple-600]="isCaregiver && selectedSlot() === slot.time" class="rounded-xl border border-slate-200 p-3 font-semibold transition-all hover:border-blue-600 hover:text-blue-600 disabled:border-dashed disabled:bg-slate-50 disabled:text-slate-300">
+                {{ slot.time }}
+              </button>
+                        </div>
+                    </div>
+
+                    <!-- Notes + attachment -->
+                    <div class="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                        <label class="mb-5 block text-base font-bold text-[#1e293b]">Additional details</label>
+                        <textarea class="mb-4 min-h-[120px] w-full rounded-xl border border-slate-200 bg-slate-50 p-4 outline-none transition-all focus:border-transparent focus:bg-white focus:ring-2" [ngClass]="isCaregiver ? 'focus:ring-purple-500' : 'focus:ring-blue-500'" [placeholder]="isCaregiver ? 'Describe care needs, patient condition...' : 'Describe symptoms...'" [ngModel]="notes()" (ngModelChange)="notes.set($event)">
+          </textarea>
+                        <div (click)="triggerFileInput()" class="cursor-pointer rounded-xl border-2 border-dashed border-slate-200 p-8 text-center text-slate-400 transition-all" [ngClass]="isCaregiver ? 'hover:border-purple-500 hover:bg-purple-50' : 'hover:border-blue-600 hover:bg-blue-50'">
+                            <i class="fa-solid fa-cloud-arrow-up mb-2 text-2xl text-slate-300"></i>
+                            <p class="text-sm font-semibold">Click to upload a file</p>
+                        </div>
+                        <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+                        <div class="mt-3 flex items-center justify-between rounded-lg bg-slate-100 p-3 text-sm" *ngIf="attachedFileName()">
+                            <span class="truncate"><i class="fa-solid fa-paperclip mr-1.5 text-slate-400"></i>{{ attachedFileName() }}</span>
+                            <button (click)="removeFile()" class="font-bold text-red-500 hover:text-red-600">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Next Step Button -->
+                    <button [disabled]="isSubmittingBooking()" class="w-full rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-transform active:scale-[0.98] disabled:opacity-60" [ngClass]="isCaregiver
+            ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-200'
+            : 'bg-[#1d4ed8] hover:bg-blue-700 shadow-blue-200'" (click)="nextStep()">
+          {{ isSubmittingBooking() ? 'Reserving your slot…' : 'Next step' }}
+        </button>
+                </div>
+
+                <!-- ══ Person Card (Doctor or Caregiver) ══ -->
+
+                <!-- Doctor Card -->
+                <aside *ngIf="isDoctor" class="rounded-[24px] bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-xl lg:sticky lg:top-8">
+                    <div *ngIf="isLoadingDoctor && !doctor()" class="flex flex-col items-center gap-3 py-10">
+                        <div class="h-10 w-10 animate-spin rounded-full border-4 border-white/25 border-t-white"></div>
+                        <p class="text-sm text-blue-100">Loading doctor…</p>
+                    </div>
+                    <ng-container *ngIf="!(isLoadingDoctor && !doctor())">
+                        <div class="mb-5 flex items-center gap-4">
+                            <img [src]="personAvatar" [alt]="personName" class="h-16 w-16 rounded-2xl border-2 border-white/30 object-cover">
+                            <div>
+                                <div class="text-xl font-bold">Dr. {{ personName }}</div>
+                                <div class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-blue-100">{{ personSpecialty }}</div>
+                            </div>
+                        </div>
+                        <div class="mb-5 h-px bg-white/20"></div>
+                        <p class="mb-5 text-sm italic leading-relaxed text-blue-50 opacity-90" *ngIf="personBio">"{{ personBio }}"</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm" *ngIf="doctorFee">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Consultation Fee: <strong>{{ doctorFee }} EGP</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm" *ngIf="personExperience">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Experience: <strong>{{ personExperience }} years</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm" *ngIf="doctorAvailableDays.length > 0">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Available: <strong>{{ doctorAvailableDays.join(', ') }}</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm">
+                                <i class="fas fa-check-circle"></i><span>Professional Care</span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm">
+                                <i class="fas fa-clock"></i><span>On-time Appointments</span>
+                            </div>
+                        </div>
+                    </ng-container>
+                </aside>
+
+                <!-- Caregiver Card -->
+                <aside *ngIf="isCaregiver" class="rounded-[24px] bg-gradient-to-br from-purple-600 to-purple-900 p-8 text-white shadow-xl lg:sticky lg:top-8">
+                    <div *ngIf="isLoadingCaregiver && !caregiver()" class="flex flex-col items-center gap-3 py-10">
+                        <div class="h-10 w-10 animate-spin rounded-full border-4 border-white/25 border-t-white"></div>
+                        <p class="text-sm text-purple-100">Loading caregiver…</p>
+                    </div>
+                    <ng-container *ngIf="!(isLoadingCaregiver && !caregiver())">
+                        <div class="mb-5 flex items-center gap-4">
+                            <img [src]="personAvatar" [alt]="personName" class="h-16 w-16 rounded-2xl border-2 border-white/30 object-cover">
+                            <div>
+                                <div class="text-xl font-bold">{{ personName }}</div>
+                                <div class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-purple-200">{{ personSpecialty }}</div>
+                            </div>
+                        </div>
+                        <div class="mb-5 h-px bg-white/20"></div>
+                        <p class="mb-5 text-sm italic leading-relaxed text-purple-100 opacity-90" *ngIf="personBio">"{{ personBio }}"</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm" *ngIf="caregiverSalary">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Monthly Salary: <strong>{{ caregiverSalary }} EGP</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm">
+                                <i class="fas fa-money-bill-alt"></i>
+                                <span>Daily rate: <strong>{{ consultOptions[0]?.price }} EGP</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm" *ngIf="personExperience">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Experience: <strong>{{ personExperience }} years</strong></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm">
+                                <i class="fas fa-heart"></i><span>Compassionate Care</span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 text-sm">
+                                <i class="fas fa-home"></i><span>Home Visits Available</span>
+                            </div>
+                        </div>
+                    </ng-container>
+                </aside>
+
+            </div>
+
+            <!--
+              ══════════════ STEP 2 — Reservation ══════════════
+              BUG FIX (master directive — API contract audit, carried forward):
+              this used to be a "Cash / Demo Pay" vs. "Card" payment form that
+              posted to POST /payments/{id}/pay as the signed-in patient. That
+              endpoint is restricted to clinic staff/admin with the
+              payments.record permission (AppointmentController::canRecordPayment()),
+              so a patient could never actually complete that call — every
+              "Pay & confirm appointment" click returned a 403, and the card
+              fields were never even transmitted to the backend. There is no
+              real payment gateway configured (PaymentGatewayInterface's only
+              binding, ManualPaymentGateway, does no external network I/O — see
+              its docblock), so this panel does not render a card form; it
+              honestly confirms the reservation and states that payment is
+              completed at the clinic. Restyled only (design-system pass) —
+              no template logic changed from the prior fix.
+            -->
+            <div *ngIf="currentStep() === 2" class="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
+
+                <!-- Left: Reservation confirmation -->
+                <div class="flex flex-col gap-6 rounded-[24px] border border-slate-200 bg-white p-8 shadow-sm">
+
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700">
+              <i class="fa-solid fa-clock"></i> Pending payment
+            </span>
+                        <h2 class="mt-3 text-2xl font-bold text-[#1e293b]">Reservation confirmed</h2>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-500">
+                            Your consultation slot is held<ng-container *ngIf="bookingReference()"> under booking reference <strong class="text-slate-700">#{{ bookingReference() }}</strong></ng-container>. This app doesn't process the payment itself —
+                            send it using one of the doctor's payment methods below, or pay in person at the clinic, and you'll be notified once it's recorded.
+                        </p>
+                    </div>
+
+                    <!--
+                      RIVA-130 follow-up (product-owner feedback, 2026-08-25):
+                      replaces the old one-size-fits-all "this clinic settles
+                      fees directly with you" line with the doctor's own,
+                      real, chosen payment methods (Settings → Payment
+                      methods) — each with the actual account number/handle
+                      to send to. Still not a real payment gateway (there
+                      isn't one in this codebase — see completePayment()'s
+                      docblock), just honest, specific instructions instead
+                      of a vague one.
+                    -->
+                    <div *ngIf="doctorPaymentMethods().length > 0" class="flex flex-col gap-3">
+                        <p class="text-xs font-bold uppercase tracking-wide text-slate-400">How to pay this doctor</p>
+                        <div *ngFor="let pm of doctorPaymentMethods()" class="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3.5">
+                            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700">
+                                <i [class]="paymentMethodIcon(pm.method)"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-[#1e293b]">{{ pm.label }}</p>
+                                <p *ngIf="pm.account_label" class="text-sm text-slate-500">{{ pm.account_label }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="doctorPaymentMethods().length === 0" class="rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4 text-sm text-slate-500">
+                        <i class="fa-solid fa-circle-info mr-1.5 text-slate-400"></i>
+                        This doctor hasn't set up online payment instructions yet — pay in person at the clinic, or ask their staff how to send payment.
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <button type="button" (click)="prevStep()" class="flex items-center gap-2 rounded-xl border border-slate-200 px-6 py-3 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50">
+              <i class="fas fa-arrow-left text-xs"></i> Back
+            </button>
+                        <button type="button" (click)="completePayment()" class="ml-auto flex items-center gap-2 rounded-xl bg-[#1d4ed8] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700">
+              <i class="fa-solid fa-check text-xs"></i>
+              Confirm reservation
+            </button>
+                    </div>
+                </div>
+
+                <!-- Right: Summary card -->
+                <aside class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+
+                    <div class="bg-[#1d4ed8] px-8 pb-6 pt-8">
+                        <p class="mb-5 text-xs font-bold uppercase tracking-widest text-blue-100">
+                            <i class="fa-solid fa-arrow-right mr-2"></i>Appointment summary
+                        </p>
+                        <p class="mb-1 text-sm text-blue-100">Amount due at clinic</p>
+                        <p class="text-4xl font-black text-white">{{ summaryPrice() }}</p>
+                    </div>
+
+                    <div class="px-8 pt-2">
+                        <div class="flex items-center justify-between border-b border-slate-100 py-4">
+                            <span class="text-sm text-slate-400">Provider</span>
+                            <span class="text-sm font-bold text-[#1e293b]">{{ personName }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-slate-100 py-4">
+                            <span class="text-sm text-slate-400">Date</span>
+                            <span class="text-sm font-bold text-[#1e293b]">{{ summaryDate() }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-slate-100 py-4">
+                            <span class="text-sm text-slate-400">Time</span>
+                            <span class="text-sm font-bold text-[#1e293b]">{{ summaryTime() }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-4">
+                            <span class="text-sm text-slate-400">Type</span>
+                            <span class="text-sm font-bold text-[#1e293b]">{{ summaryType() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Status notice -->
+                    <div class="mx-6 mb-6 rounded-2xl bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-700">
+                        <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>
+                        Status: pending payment. The doctor is notified after the clinic records payment.
+                    </div>
+                </aside>
+
+            </div>
+
+            <!--
+              ══════════════ STEP 3 — Reservation received ══════════════
+              This used to read "Payment successful / Appointment confirmed",
+              which was false: no payment is ever processed by this app (see
+              step 2's comment), and the backend leaves the appointment at
+              status=pending_payment / payment_status=unpaid until clinic
+              staff record payment via the admin-only pay() endpoint. Copy
+              fixed to match reality — this is a hold confirmation, not a
+              payment receipt.
+            -->
+            <div *ngIf="currentStep() === 3" class="grid place-items-center py-6">
+                <section class="w-full max-w-xl rounded-[24px] border border-amber-100 bg-white p-10 text-center shadow-sm">
+                    <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-3xl bg-amber-50 text-3xl text-amber-500">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-amber-600">Pending payment</p>
+                    <h1 class="mt-2 text-3xl font-black text-[#1e293b]">Appointment reserved</h1>
+                    <p class="mt-4 text-slate-500">
+                        <ng-container *ngIf="bookingReference()">Booking reference <strong class="text-slate-700">#{{ bookingReference() }}</strong>. </ng-container>Your slot is held. Payment is completed at the clinic — the doctor will be notified and your appointment confirmed as soon as it's recorded.
+                    </p>
+                    <div class="mt-8 flex flex-wrap justify-center gap-3">
+                        <button type="button" (click)="reschedule()" class="rounded-xl border border-slate-200 px-6 py-3 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50">
+              Change date / time
+            </button>
+                        <button type="button" routerLink="/dashboard-p" class="rounded-xl bg-[#1d4ed8] px-8 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700">
+              Go to dashboard
+            </button>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+</div>

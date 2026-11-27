@@ -1,0 +1,132 @@
+.robot-wrap {
+    position: relative;
+    width: 200px;
+    height: 210px;
+    animation: robotFloat 3s ease-in-out infinite;
+}
+
+.robot-svg {
+    width: 180px;
+    height: 190px;
+    overflow: visible;
+}
+
+.robot-shadow {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 14px;
+    background: rgba(37, 99, 235, 0.18);
+    border-radius: 50%;
+    filter: blur(6px);
+    animation: shadowPulse 3s ease-in-out infinite;
+}
+
+.eye-group {
+    animation: blink 4s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.antenna-dot {
+    animation: antennaPulse 1.4s ease-in-out infinite;
+}
+
+.arm-right {
+    transform-origin: 148px 108px;
+    animation: armWave 2.4s ease-in-out infinite;
+}
+
+.loading-bar-track {
+    width: 180px;
+    height: 3px;
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 16px auto 0;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #6366f1);
+    border-radius: 99px;
+    animation: loadBar 3.6s ease-in-out infinite;
+}
+
+@keyframes robotFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes shadowPulse {
+    0%,
+    100% {
+        width: 90px;
+        opacity: 0.7;
+    }
+    50% {
+        width: 60px;
+        opacity: 0.35;
+    }
+}
+
+@keyframes blink {
+    0%,
+    90%,
+    100% {
+        transform: scaleY(1);
+    }
+    95% {
+        transform: scaleY(0.1);
+    }
+}
+
+@keyframes antennaPulse {
+    0%,
+    100% {
+        r: 5;
+        opacity: 0.9;
+    }
+    50% {
+        r: 8;
+        opacity: 0.5;
+    }
+}
+
+@keyframes armWave {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(15deg);
+    }
+    75% {
+        transform: rotate(-10deg);
+    }
+}
+
+@keyframes loadBar {
+    0% {
+        width: 0%;
+        opacity: 1;
+    }
+    70% {
+        width: 90%;
+        opacity: 1;
+    }
+    90% {
+        width: 100%;
+        opacity: 1;
+    }
+    100% {
+        width: 100%;
+        opacity: 0;
+    }
+}

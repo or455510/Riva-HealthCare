@@ -1,0 +1,97 @@
+<div class="flex h-screen bg-[#f0f9ff] overflow-hidden font-sans">
+
+    <app-sidebar></app-sidebar>
+
+    <div class="flex-1 flex flex-col overflow-hidden md:pl-20">
+
+        <app-dashboard-header
+            [name]="currentDoctor.name"
+            [avatar]="currentDoctor.avatar"
+            [status]="currentDoctor.status"
+        ></app-dashboard-header>
+
+        <!--
+            Phase 6 UX-priority order (spec item: "communicate this hierarchy"):
+              1. What requires immediate attention?  -> emergency alerts, then the
+                 Attention/review-required card
+              2. Who is the current/next patient?    -> live queue
+              3. What is happening today?             -> Today
+              4. What quick action does the doctor need? -> Quick Actions
+              5. Business/revenue overview             -> Business
+              6. Recent bookings/notifications         -> Recent bookings
+
+            Patient Follow Requests (pre-existing, pre-Phase-5) and My
+            Patients + analytics aren't part of that 6-item ranking, so they
+            sit after Quick Actions — same relative position Phase 5 shipped
+            them in — without displacing any of the six ranked sections.
+            This same stacked order is used at every breakpoint: Phase 6
+            asks for a genuinely single-column mobile layout, not a
+            reshuffled one, so there's no separate "mobile order" to keep in
+            sync with this one.
+        -->
+        <main class="flex-1 overflow-y-auto px-4 pb-8 space-y-6 sm:px-8">
+
+            <app-dashboard-emergency-alerts
+                [count]="emergencyAlertsCount"
+                [alerts]="emergencyAlerts"
+            ></app-dashboard-emergency-alerts>
+
+            <app-dashboard-queue
+                [isLoading]="isLoadingQueue"
+                [error]="queueError"
+                [queueView]="doctorQueueView"
+                [canManageQueue]="canManageQueue"
+                [callingAppointmentId]="callingAppointmentId"
+                [callError]="callError"
+                [patientsBeforeNext]="patientsBeforeNext()"
+                [todayAppointmentsCount]="clinicStats.todayAppointments"
+                (retry)="loadQueue()"
+                (callPatient)="callPatient($event)"
+            ></app-dashboard-queue>
+
+            <app-dashboard-today
+                [isLoading]="isLoadingPatients"
+                [stats]="todayStats"
+            ></app-dashboard-today>
+
+            <app-dashboard-attention
+                [isLoading]="isLoadingPatients"
+                [adherence]="stats.adherence"
+                [reviewItems]="reviewItems"
+            ></app-dashboard-attention>
+
+            <app-dashboard-quick-actions
+                [canManageServices]="canManageServices"
+                [isLoadingPermissions]="isLoadingPermissions"
+            ></app-dashboard-quick-actions>
+
+            <app-dashboard-follow-requests
+                [isLoading]="isLoadingRequests"
+                [requests]="pendingRequests"
+                (accept)="acceptRequest($event)"
+                (reject)="rejectRequest($event)"
+            ></app-dashboard-follow-requests>
+
+            <app-dashboard-my-patients
+                [patients]="patients"
+                [hasPatientAnalytics]="hasPatientAnalytics"
+                [pieOptions]="pieOptions"
+                [lineOptions]="lineOptions"
+            ></app-dashboard-my-patients>
+
+            <app-dashboard-business
+                [stats]="businessStats"
+                [canManageServices]="canManageServices"
+                [isLoadingPermissions]="isLoadingPermissions"
+                [hasRevenueAnalytics]="hasRevenueAnalytics"
+                [revenueOptions]="revenueOptions"
+            ></app-dashboard-business>
+
+            <app-dashboard-recent-bookings
+                [isLoading]="isLoadingPatients"
+                [bookings]="recentBookings"
+            ></app-dashboard-recent-bookings>
+
+        </main>
+    </div>
+</div>

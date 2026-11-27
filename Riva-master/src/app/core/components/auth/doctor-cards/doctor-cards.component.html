@@ -1,0 +1,196 @@
+<div class="flex min-h-screen bg-[#f7f8fb] font-sans" dir="ltr">
+  <app-sidebar></app-sidebar>
+
+  <main class="flex-1 p-4 sm:p-8 md:pl-28">
+    <div class="mx-auto flex max-w-6xl flex-col gap-6">
+
+      <!-- Page header -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-blue-600">My Care Team</p>
+          <h1 class="mt-1 text-2xl font-bold text-[#1e293b] sm:text-3xl">Find a Doctor</h1>
+          <p class="mt-1 text-sm text-slate-500">Choose who will follow your health. You can change this later at any time.</p>
+        </div>
+
+        <div *ngIf="!isLoading && !errorMessage && doctors.length > 0" class="flex gap-3">
+          <div class="min-w-[92px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm">
+            <p class="text-xl font-bold text-[#1e293b]">{{ doctors.length }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Doctors</p>
+          </div>
+          <div class="min-w-[92px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm">
+            <p class="text-xl font-bold text-blue-600">{{ verifiedCount }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Verified</p>
+          </div>
+          <div class="min-w-[92px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm">
+            <p class="text-xl font-bold text-emerald-600">{{ followingCount }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Following</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIVA-141: real backend-filtered search (specialty + location query
+           params on GET /doctors — see DoctorController::index()). Results
+           refetch as you type (debounced), not filtered client-side.
+           RIVA-141 follow-up: `list` + <datalist> gives a real native
+           dropdown of suggestions (populated from GET /doctors/filter-options
+           — real distinct values already in the data), while still allowing
+           free typing for anything not yet in the list. -->
+      <div class="flex flex-col gap-3 rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-stethoscope absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-300"></i>
+          <input
+            type="text"
+            list="doctor-specialty-options"
+            [(ngModel)]="specialtyFilter"
+            (ngModelChange)="onFilterInput()"
+            placeholder="Filter by specialty (e.g. Cardiology)"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm font-medium text-[#1e293b] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+          />
+          <datalist id="doctor-specialty-options">
+            <option *ngFor="let s of specialtyOptions" [value]="s"></option>
+          </datalist>
+        </div>
+        <div class="relative flex-1">
+          <i class="fa-solid fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-300"></i>
+          <input
+            type="text"
+            list="doctor-location-options"
+            [(ngModel)]="locationFilter"
+            (ngModelChange)="onFilterInput()"
+            placeholder="Filter by area / address"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm font-medium text-[#1e293b] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+          />
+          <datalist id="doctor-location-options">
+            <option *ngFor="let l of locationOptions" [value]="l"></option>
+          </datalist>
+        </div>
+        <button
+          *ngIf="hasActiveFilters"
+          (click)="clearFilters()"
+          class="shrink-0 rounded-xl bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-500 transition-colors hover:bg-slate-100"
+        >
+          Clear
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex h-64 flex-col items-center justify-center gap-3">
+        <div class="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+        <p class="text-sm font-semibold text-slate-400">Loading doctors…</p>
+      </div>
+
+      <!-- Error State -->
+      <div
+        *ngIf="!isLoading && errorMessage"
+        class="rounded-[24px] border border-red-100 bg-white p-8 text-center shadow-sm"
+      >
+        <i class="fa-solid fa-triangle-exclamation mb-3 text-3xl text-red-400"></i>
+        <p class="mb-1 font-semibold text-[#1e293b]">Couldn't load doctors</p>
+        <p class="text-sm text-slate-500">{{ errorMessage }}</p>
+        <button
+          (click)="loadDoctors()"
+          class="mt-4 rounded-xl bg-[#1d4ed8] px-6 py-2 font-bold text-white transition-all hover:bg-blue-700"
+        >
+          Try again
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && !errorMessage && doctors.length === 0"
+        class="flex flex-col items-center rounded-[24px] border border-slate-200 bg-white p-8 text-slate-400 shadow-sm sm:p-16"
+      >
+        <i class="fa-solid fa-user-doctor mb-4 text-5xl text-slate-200"></i>
+        <p class="text-lg font-semibold">{{ hasActiveFilters ? 'No doctors match your filters' : 'No doctors available at the moment' }}</p>
+        <p class="mt-1 text-sm">{{ hasActiveFilters ? 'Try a different specialty or area.' : 'Check back soon — new doctors are verified regularly.' }}</p>
+        <button
+          *ngIf="hasActiveFilters"
+          (click)="clearFilters()"
+          class="mt-4 rounded-xl bg-blue-50 px-6 py-2 font-bold text-blue-700 transition-all hover:bg-blue-100"
+        >
+          Clear filters
+        </button>
+      </div>
+
+      <!-- Doctors Grid -->
+      <div *ngIf="!isLoading && !errorMessage && doctors.length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div
+          *ngFor="let doctor of doctors"
+          class="flex flex-col gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
+        >
+          <!-- Identity row -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex min-w-0 items-center gap-3">
+              <div class="relative shrink-0">
+                <div class="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 p-0.5">
+                  <img
+                    [src]="getAvatarUrl(doctor)"
+                    [alt]="getDoctorName(doctor)"
+                    class="h-full w-full rounded-full object-cover"
+                  />
+                </div>
+                <span
+                  *ngIf="getRating(doctor)"
+                  class="absolute -bottom-1 -right-1 flex items-center gap-0.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-black text-white shadow-sm"
+                >
+                  <i class="fa-solid fa-star text-[8px]"></i>{{ getRating(doctor) }}
+                </span>
+              </div>
+              <div class="min-w-0">
+                <p class="flex items-center gap-1.5 truncate font-semibold text-[#1e293b]">
+                  <span class="truncate">Dr. {{ getDoctorName(doctor) }}</span>
+                  <span
+                    *ngIf="isDoctorVerified(doctor)"
+                    title="Verified doctor"
+                    class="inline-grid h-4 w-4 shrink-0 place-items-center rounded-full bg-blue-600 text-white"
+                  >
+                    <i class="fa-solid fa-check text-[9px]"></i>
+                  </span>
+                </p>
+                <p class="truncate text-sm text-slate-500">{{ getSpecialty(doctor) }}</p>
+              </div>
+            </div>
+
+            <span
+              *ngIf="doctor.follow_status"
+              class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+              [ngClass]="{
+                'bg-amber-100 text-amber-700': doctor.follow_status === 'pending',
+                'bg-green-100 text-green-700': doctor.follow_status === 'active' || doctor.follow_status === 'accepted',
+                'bg-red-100 text-red-600': doctor.follow_status === 'rejected'
+              }"
+            >
+              {{ doctor.follow_status === 'pending' ? 'Pending' : (doctor.follow_status === 'rejected' ? 'Not Accepted' : 'Following') }}
+            </span>
+          </div>
+
+          <!-- Bio -->
+          <p class="line-clamp-2 text-sm text-slate-500">{{ getBio(doctor) }}</p>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+            <button
+              (click)="selectDoctor(doctor)"
+              class="flex-1 rounded-xl bg-[#1d4ed8] py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-blue-700 active:scale-95"
+            >
+              View Profile
+            </button>
+            <button
+              (click)="requestFollow(doctor, $event)"
+              [disabled]="isFollowActionDisabled(doctor)"
+              class="flex-1 rounded-xl py-2.5 text-xs font-bold uppercase tracking-widest transition-all disabled:cursor-not-allowed"
+              [ngClass]="{
+                'bg-blue-50 text-blue-700 hover:bg-blue-100': !doctor.follow_status || doctor.follow_status === 'rejected',
+                'bg-amber-50 text-amber-700': doctor.follow_status === 'pending',
+                'bg-green-50 text-green-700': doctor.follow_status === 'active' || doctor.follow_status === 'accepted'
+              }"
+            >
+              {{ followButtonLabel(doctor) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

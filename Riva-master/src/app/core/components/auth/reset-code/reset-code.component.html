@@ -1,0 +1,16 @@
+<div class="min-h-screen bg-[#F8F9FB] flex items-center justify-center px-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full max-w-sm bg-white p-8 rounded-2xl shadow-sm space-y-5">
+    <div class="text-center">
+      <img src="/Picture1.png" class="w-16 h-16 mx-auto object-contain" alt="RIVA Logo">
+      <h1 class="text-2xl font-bold text-[#1A2D51] mt-4">Verification code</h1>
+      <p class="text-sm text-gray-400 mt-2">Enter the 6-digit code sent to your email.</p>
+    </div>
+
+    <input formControlName="code" inputmode="numeric" maxlength="6" placeholder="000000" class="w-full text-center tracking-[0.4em] px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-lg outline-none">
+    <p *ngIf="message" class="text-center text-sm text-red-500">{{ message }}</p>
+
+    <button type="submit" [disabled]="loading" class="w-full bg-[#2D5BFF] text-white py-4 rounded-2xl font-bold text-sm disabled:opacity-60">
+      {{ loading ? 'Verifying...' : 'Verify code' }}
+    </button>
+  </form>
+</div>

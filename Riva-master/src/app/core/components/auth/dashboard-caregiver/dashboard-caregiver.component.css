@@ -1,0 +1,56 @@
+/* Caregiver Dashboard Styles */
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* Smooth transitions */
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+
+/* Gradient backgrounds */
+
+.bg-gradient-to-br {
+    background-image: linear-gradient(135deg, var(--tw-gradient-stops));
+}
+
+
+/* Animation for loading skeletons */
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+    .min-h-screen {
+        min-height: auto;
+    }
+    .md\:p-8 {
+        padding: 1rem;
+    }
+    .md\:pl-28 {
+        padding-left: 0;
+    }
+}

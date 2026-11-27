@@ -1,0 +1,1 @@
+import{Ia as s,Ya as n,Za as o,sb as p}from"./chunk-OTEQ2U53.js";import"./chunk-2NFLSA4Y.js";var r=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=s({type:t,selectors:[["app-users"]],decls:2,vars:0,template:function(e,m){e&1&&(n(0,"p"),p(1,"users works!"),o())},encapsulation:2})};export{r as UsersComponent};

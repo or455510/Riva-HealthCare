@@ -1,0 +1,206 @@
+<div class="flex min-h-screen bg-[#f7f8fb] font-sans">
+    <app-sidebar></app-sidebar>
+
+    <main class="flex-1 p-4 sm:p-8 md:pl-28">
+        <div class="mx-auto flex max-w-6xl flex-col gap-6">
+
+            <!-- Page header -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-blue-600">Caregiver</p>
+                    <h1 class="mt-1 text-2xl font-bold text-[#1e293b] sm:text-3xl">Caregiver Dashboard</h1>
+                    <p class="mt-1 text-sm text-slate-500">Welcome back, {{ currentCaregiver.name || 'Caregiver' }}.</p>
+                </div>
+
+                <div *ngIf="!isLoadingPatients && !isLoadingRequests && (stats.total > 0 || pendingRequests.length > 0)" class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm sm:min-w-[84px] sm:px-4 sm:py-3">
+                        <p class="text-lg font-bold text-[#1e293b] sm:text-xl">{{ stats.total }}</p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">Patients</p>
+                    </div>
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm sm:min-w-[84px] sm:px-4 sm:py-3">
+                        <p class="text-lg font-bold text-rose-600 sm:text-xl">{{ stats.highRisk }}</p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">Critical</p>
+                    </div>
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm sm:min-w-[84px] sm:px-4 sm:py-3">
+                        <p class="text-lg font-bold text-emerald-600 sm:text-xl">{{ stats.adherence }}%</p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">Adherence</p>
+                    </div>
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm sm:min-w-[84px] sm:px-4 sm:py-3">
+                        <p class="text-lg font-bold text-amber-500 sm:text-xl">{{ pendingRequests.length }}</p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">Pending</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Follow Requests -->
+            <div class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:p-7">
+                <div class="mb-5 flex items-center justify-between">
+                    <h2 class="flex items-center gap-2 text-base font-bold text-[#1e293b]">
+                        Follow Requests
+                        <span *ngIf="pendingRequests.length > 0" class="rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-black text-white">
+                            {{ pendingRequests.length }}
+                        </span>
+                    </h2>
+                </div>
+
+                <!-- Loading -->
+                <div *ngIf="isLoadingRequests" class="flex h-24 items-center justify-center">
+                    <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+                </div>
+
+                <!-- Empty -->
+                <div *ngIf="!isLoadingRequests && pendingRequests.length === 0" class="flex flex-col items-center py-10 text-slate-400">
+                    <i class="fa-solid fa-user-check mb-3 text-4xl text-slate-200"></i>
+                    <p class="text-sm font-medium">No pending follow requests</p>
+                </div>
+
+                <!-- List -->
+                <div *ngIf="!isLoadingRequests && pendingRequests.length > 0" class="flex flex-col gap-3">
+                    <div *ngFor="let req of pendingRequests" class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center">
+                        <img [src]="req.avatar" [alt]="req.name" class="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white">
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate font-semibold text-[#1e293b]">{{ req.name }}</p>
+                            <p class="truncate text-sm text-slate-500">{{ req.condition }} &middot; requested {{ req.requestedAt }}</p>
+                        </div>
+                        <div class="flex shrink-0 gap-2">
+                            <button
+                                (click)="acceptRequest(req)"
+                                [disabled]="req.isProcessing"
+                                class="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <i class="fas fa-check"></i> Accept
+                            </button>
+                            <button
+                                (click)="rejectRequest(req)"
+                                [disabled]="req.isProcessing"
+                                class="flex items-center gap-1.5 rounded-xl bg-red-50 px-4 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+
+                <!-- My Patients -->
+                <div class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:p-7 lg:col-span-8">
+                    <div class="mb-5 flex items-center justify-between">
+                        <h2 class="text-base font-bold text-[#1e293b]">My Patients</h2>
+                        <span class="text-xs font-semibold text-slate-400">{{ patients.length }} total</span>
+                    </div>
+
+                    <!-- Loading -->
+                    <div *ngIf="isLoadingPatients" class="flex h-40 items-center justify-center">
+                        <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+                    </div>
+
+                    <!-- Empty -->
+                    <div *ngIf="!isLoadingPatients && patients.length === 0" class="flex flex-col items-center py-12 text-slate-400">
+                        <i class="fa-solid fa-users mb-4 text-5xl text-slate-200"></i>
+                        <p class="text-sm font-semibold">No patients yet</p>
+                        <p class="mt-1 text-xs">Accept a follow request above to see patients here.</p>
+                    </div>
+
+                    <!-- List -->
+                    <div *ngIf="!isLoadingPatients && patients.length > 0" class="flex flex-col gap-2">
+                        <div
+                            *ngFor="let patient of patients"
+                            [routerLink]="['/chat-c']"
+                            class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl p-3 transition-colors hover:bg-slate-50"
+                        >
+                            <div class="flex min-w-0 items-center gap-3">
+                                <span
+                                    class="h-2.5 w-2.5 shrink-0 rounded-full"
+                                    [class.bg-rose-500]="patient.status === 'Critical'"
+                                    [class.bg-orange-400]="patient.status === 'Attention'"
+                                    [class.bg-emerald-500]="patient.status === 'Stable'"
+                                ></span>
+                                <img [src]="patient.img" class="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white" [alt]="patient.name">
+                                <div class="min-w-0">
+                                    <h3 class="truncate text-sm font-bold text-[#1e293b]">{{ patient.name }}</h3>
+                                    <p class="truncate text-xs text-slate-400">{{ patient.condition }}</p>
+                                </div>
+                            </div>
+                            <div class="shrink-0 text-right">
+                                <p class="text-xs font-semibold text-slate-500">Room {{ patient.room }}</p>
+                                <span
+                                    class="mt-1 inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+                                    [ngClass]="{
+                                        'bg-rose-100 text-rose-700': patient.status === 'Critical',
+                                        'bg-orange-100 text-orange-700': patient.status === 'Attention',
+                                        'bg-emerald-100 text-emerald-700': patient.status === 'Stable'
+                                    }"
+                                >
+                                    {{ patient.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Assistant -->
+                <div class="flex flex-col items-center gap-4 rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:p-7 lg:col-span-4">
+                    <div
+                        class="relative h-[180px] w-full cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-blue-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Open Riva AI Assistant"
+                        (click)="openAiAssistant()"
+                        (keydown.enter)="openAiAssistant()"
+                        (keydown.space)="$event.preventDefault(); openAiAssistant()">
+                        <div class="absolute left-4 top-4 z-10 rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
+                            <p class="text-sm font-bold text-blue-600">Hey! I'm Riva 👋</p>
+                        </div>
+                        <spline-viewer url="https://prod.spline.design/RfqAjOnSviCEEX3U/scene.splinecode" class="h-full w-full"></spline-viewer>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#1e293b]">Medical AI Assistant</h3>
+                    <div class="flex w-full flex-col gap-2">
+                        <button
+                            (click)="openAiAssistant()"
+                            class="flex items-center gap-3 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-700 transition-colors hover:bg-blue-100"
+                        >
+                            <i class="fa-solid fa-chart-area"></i> Analyze Patient Trends
+                        </button>
+                        <button
+                            (click)="openAiAssistant()"
+                            class="flex items-center gap-3 rounded-xl bg-orange-50 p-3 text-xs font-bold text-orange-700 transition-colors hover:bg-orange-100"
+                        >
+                            <i class="fa-solid fa-circle-exclamation"></i> Risk Assessment
+                        </button>
+                        <button
+                            (click)="openAiAssistant()"
+                            class="flex items-center gap-3 rounded-xl bg-emerald-50 p-3 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100"
+                        >
+                            <span>💊</span> Drug Interactions
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Patient Status -->
+                <div class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:p-7 lg:col-span-6">
+                    <h2 class="mb-4 text-xs font-bold uppercase tracking-widest text-slate-800">Patient Status</h2>
+                    <div *ngIf="!hasPatientAnalytics" class="flex h-[280px] flex-col items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-chart-pie mb-3 text-4xl text-slate-200"></i>
+                        <p class="text-sm font-medium">No patient data available yet.</p>
+                    </div>
+                    <apx-chart *ngIf="hasPatientAnalytics" [series]="pieOptions.series" [chart]="pieOptions.chart" [labels]="pieOptions.labels" [colors]="pieOptions.colors" [responsive]="pieOptions.responsive">
+                    </apx-chart>
+                </div>
+
+                <!-- Weekly Patients -->
+                <div class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm sm:p-7 lg:col-span-6">
+                    <h2 class="mb-4 text-xs font-bold uppercase tracking-widest text-slate-800">Weekly Patients</h2>
+                    <div *ngIf="!hasPatientAnalytics" class="flex h-[280px] flex-col items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-chart-line mb-3 text-4xl text-slate-200"></i>
+                        <p class="text-sm font-medium">No patient data available yet.</p>
+                    </div>
+                    <apx-chart *ngIf="hasPatientAnalytics" [series]="lineOptions.series" [chart]="lineOptions.chart" [xaxis]="lineOptions.xaxis" [stroke]="lineOptions.stroke" [colors]="lineOptions.colors">
+                    </apx-chart>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>

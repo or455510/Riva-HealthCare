@@ -1,0 +1,245 @@
+<div class="admin-shell">
+    <app-sidebar></app-sidebar>
+
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <!-- <aside class="sidebar">
+        <div class="sidebar-logo">RV</div>
+        <nav class="sidebar-nav">
+            <button class="nav-btn active" title="Home"><i class="fas fa-home"></i></button>
+            <button class="nav-btn" title="Doctors"><i class="fas fa-stethoscope"></i></button>
+            <button class="nav-btn" title="Users"><i class="fas fa-users"></i></button>
+            <button class="nav-btn nav-btn--outlined" title="Messages"><i class="fas fa-comment-dots"></i></button>
+            <button class="nav-btn" title="Profile"><i class="fas fa-user-circle"></i></button>
+        </nav>
+        <div class="sidebar-bell"><i class="fas fa-bell"></i></div>
+    </aside> -->
+    <!-- <aside class="fixed left-0 top-0 h-screen w-20 bg-white border-r border-gray-200 hidden md:flex flex-col items-center py-6 gap-8 shadow-sm z-50">
+        <div class="text-blue-600 font-bold text-xl">
+            <img src="/Picture1.png" routerLink="/dashboard-p" alt="RIVA Logo" class="w-12">
+        </div>
+        <div class="flex flex-col gap-6 text-gray-400">
+            <button class="p-2 bg-blue-50 text-blue-600 rounded-lg" routerLink="/dashboard-p"><i class="fas fa-home"></i></button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/add-new-medication"><i class="fas fa-pills"></i></button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/doctor-cards"><i class="fa-solid fa-user-doctor"></i></button>
+            <button class="p-2 hover:text-blue-600" routerLink="/chat"><i class="fa-brands fa-rocketchat"></i></button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/myprofile"><i class="fa-solid fa-circle-user"></i></button>
+            <button class="p-2 hover:text-blue-600 transition-colors" routerLink="/caregiver-cards"><i class="fa-solid fa-user-nurse"></i></button>
+        </div>
+    </aside> -->
+    <!-- ═══ MAIN ═══ -->
+    <main class="admin-main">
+
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="flex justify-end">
+                <app-logout-button [showLabel]="true" buttonClass="inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"></app-logout-button>
+            </div>
+            <div class="header-badge">Admin Panel</div>
+            <h1 class="admin-title">System Activity Logs</h1>
+            <p class="admin-subtitle">Monitor all actions across the platform in real time</p>
+        </header>
+
+        <!-- ══ Stats (8 cards from real API) ══ -->
+        <div class="stats-grid">
+
+            <ng-container *ngIf="statsLoading">
+                <div class="stat-card shimmer" *ngFor="let s of [1,2,3,4,5,6,7]"></div>
+            </ng-container>
+
+            <ng-container *ngIf="!statsLoading">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--blue"><i class="fas fa-users"></i></div>
+                    <div>
+                        <p class="stat-label">Total Users</p>
+                        <span class="stat-value">{{ stats.total_users }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--teal"><i class="fas fa-user-injured"></i></div>
+                    <div>
+                        <p class="stat-label">Patients</p>
+                        <span class="stat-value">{{ stats.total_patients }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--green"><i class="fas fa-user-md"></i></div>
+                    <div>
+                        <p class="stat-label">Doctors</p>
+                        <span class="stat-value">{{ stats.total_doctors }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--purple"><i class="fas fa-hands-helping"></i></div>
+                    <div>
+                        <p class="stat-label">Caregivers</p>
+                        <span class="stat-value">{{ stats.total_caregivers }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--orange"><i class="fas fa-user-check"></i></div>
+                    <div>
+                        <p class="stat-label">Pending Verifications</p>
+                        <span class="stat-value">{{ stats.pending_doctor_verifications }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--red"><i class="fas fa-bell"></i></div>
+                    <div>
+                        <p class="stat-label">Active Alerts</p>
+                        <span class="stat-value">{{ stats.active_alerts }}</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--dark"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div>
+                        <p class="stat-label">High Risk Cases</p>
+                        <span class="stat-value">{{ stats.high_risk_cases }}</span>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
+
+        <!-- ══ Activity Logs Table ══ -->
+        <div class="table-card">
+
+            <!-- Toolbar -->
+            <div class="table-toolbar">
+                <div class="filter-group">
+                    <i class="fas fa-filter filter-icon"></i>
+                    <select class="filter-select" (change)="onActionFilterChange($any($event.target).value)">
+                        <option *ngFor="let opt of actionOptions" [value]="opt">{{ opt }}</option>
+                    </select>
+                </div>
+                <div class="toolbar-right">
+                    <select class="filter-select" (change)="onDateFilterChange($any($event.target).value)">
+                        <option *ngFor="let opt of dateOptions" [value]="opt.value">{{ opt.label }}</option>
+                    </select>
+                    <div class="date-badge">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ today }}</span>
+                    </div>
+                    <button class="refresh-btn" (click)="reload()" title="Refresh">
+                        <i class="fas fa-sync-alt" [class.spinning]="logsLoading"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="logsLoading" class="loading-row">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading logs...
+            </div>
+
+            <!-- Empty -->
+            <div *ngIf="!logsLoading && logs.length === 0" class="empty-row">
+                <i class="fas fa-inbox"></i>
+                <p>No activity logs found</p>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrap" *ngIf="!logsLoading && logs.length > 0">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let log of logs; let i = index" [class.row-alt]="i % 2 !== 0">
+                            <td class="td-id">{{ log.id }}</td>
+                            <td class="td-time">{{ log.timestamp }}</td>
+                            <td class="td-user">{{ log.user }}</td>
+                            <td><span class="role-pill" [class]="'role-pill role-pill--' + log.role">{{ log.role }}</span></td>
+                            <td class="td-action">{{ log.action }}</td>
+                            <td class="td-desc">{{ log.description }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" *ngIf="totalPages > 1">
+                <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                <button class="page-btn" *ngFor="let p of pageNumbers" [class.page-btn--active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
+                <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+                <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+            </div>
+
+        </div>
+
+        <!-- ══ Recent Registrations ══ -->
+        <div class="table-card" *ngIf="recentRegistrations.length > 0">
+            <div class="table-toolbar">
+                <h3 class="section-title"><i class="fas fa-user-plus"></i> Recent Registrations</h3>
+            </div>
+            <div class="table-wrap">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Phone</th>
+                            <th>Last Login</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let u of recentRegistrations; let i = index" [class.row-alt]="i % 2 !== 0">
+                            <td class="td-user">{{ u.name || (u.first_name + ' ' + u.last_name) }}</td>
+                            <td class="td-desc">{{ u.email }}</td>
+                            <td><span class="role-pill" [class]="'role-pill role-pill--' + u.role">{{ u.role }}</span></td>
+                            <td class="td-desc">{{ u.phone || '—' }}</td>
+                            <td class="td-time">{{ u.last_login_at || 'Never' }}</td>
+                            <td class="td-time">{{ u.created_at }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ Suspicious Logins ══ -->
+        <div class="table-card" *ngIf="suspiciousLogins.length > 0">
+            <div class="table-toolbar">
+                <h3 class="section-title" style="color: var(--red)"><i class="fas fa-shield-alt"></i> Suspicious Login Attempts</h3>
+            </div>
+            <div class="table-wrap">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>IP Address</th>
+                            <th>Reason</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let s of suspiciousLogins; let i = index" [class.row-alt]="i % 2 !== 0">
+                            <td class="td-user" style="color: var(--red)">{{ s.email }}</td>
+                            <td class="td-time">{{ s.ip_address }}</td>
+                            <td class="td-desc">{{ s.reason }}</td>
+                            <td class="td-time">{{ s.created_at }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>

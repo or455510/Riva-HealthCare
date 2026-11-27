@@ -1,0 +1,1 @@
+import{Ia as o,Ya as i,Za as n,sb as s}from"./chunk-OTEQ2U53.js";import"./chunk-2NFLSA4Y.js";var a=class e{static \u0275fac=function(t){return new(t||e)};static \u0275cmp=o({type:e,selectors:[["app-activity-logs"]],decls:2,vars:0,template:function(t,p){t&1&&(i(0,"p"),s(1,"activity-logs works!"),n())},encapsulation:2})};export{a as ActivityLogsComponent};

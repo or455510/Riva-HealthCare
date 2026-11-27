@@ -1,0 +1,14 @@
+/*
+  RIVA-125 (visual redesign pass, design-system alignment): the previous rules
+  here (.pay-wrap, .pay-card, .method-btn, .field-input, .summary-panel,
+  .btn-pay, .btn-fail, .visa-badge, .live-dot, etc.) styled a Cash/Card
+  payment form and a "Secure Checkout" panel that no longer exist in this
+  template — that UI was removed because there is no real payment gateway
+  behind it (see booking.component.html's step-2 comment and
+  PaymentGatewayInterface's docblock). None of those classes were referenced
+  anywhere in the current template (verified before deleting), so they were
+  dead weight, not active styling. The page now uses only the shared Tailwind
+  utility design system (bg-[#f7f8fb] canvas, rounded-[20px]/[24px] white
+  cards, bg-[#1d4ed8] primary actions) applied inline in the template, the
+  same as the other redesigned pages — no page-specific stylesheet is needed.
+*/

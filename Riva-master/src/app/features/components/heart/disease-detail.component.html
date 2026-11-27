@@ -1,0 +1,124 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-inner">
+    <a class="logo" routerLink="/home" aria-label="Riva home">
+      <img src="/disease-details/riva-logo.png" alt="Riva logo" class="logo-img" (error)="onImageError($event)" />
+    </a>
+
+    <ul class="nav-links">
+      <li><a routerLink="/home">Home</a></li>
+      <li><a routerLink="/home" fragment="platform">Platform</a></li>
+      <li><a routerLink="/home" fragment="diseases">Diseases</a></li>
+      <li><a routerLink="/home" fragment="contact">Contact Us</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="btn-outline" routerLink="/signin">Login</button>
+      <button class="btn-primary" routerLink="/signup">Create Account</button>
+    </div>
+
+    <button class="hamburger" type="button" (click)="toggleMenu()">☰</button>
+  </div>
+
+  <div class="mobile-menu" [class.open]="isMenuOpen">
+    <a routerLink="/home">Home</a>
+    <a routerLink="/home" fragment="platform">Platform</a>
+    <a routerLink="/home" fragment="diseases">Diseases</a>
+    <a routerLink="/home" fragment="contact">Contact Us</a>
+    <button class="btn-primary" routerLink="/signup">Create Account</button>
+  </div>
+</nav>
+
+<main class="disease-page">
+  <section class="hero" id="hero">
+    <div class="hero-bg-gradient"></div>
+
+    <button class="back-btn" type="button" (click)="goBackHome()">← Back to diseases</button>
+
+    <div class="hero-content">
+      <div class="hero-image-wrap">
+        <div class="ring-glow"></div>
+        <div class="hero-image-ring"></div>
+        <div class="hero-image-ring ring2"></div>
+
+        <div class="hero-photo-wrap">
+          <img [src]="disease.mainImage" [alt]="disease.title" class="hero-photo" (error)="onImageError($event)" />
+        </div>
+
+        <div class="badge-float badge1">{{ disease.badgeOne }}</div>
+        <div class="badge-float badge2">{{ disease.badgeTwo }}</div>
+
+        <div class="ecg-bar">
+          <svg viewBox="0 0 220 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <polyline
+              points="0,20 30,20 42,5 52,34 62,2 72,22 90,22 104,20 140,20 180,20 220,20"
+              fill="none"
+              stroke="#1a6cf6"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ecg-line-bar"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div class="hero-text">
+        <p class="hero-label">{{ disease.label }}</p>
+        <h1 class="hero-title">{{ disease.title }}</h1>
+        <p class="hero-sub">{{ disease.subtitle }}</p>
+
+        <div class="card-highlight">
+          <div class="card-dot"></div>
+          <p><strong>{{ disease.highlightTitle }}</strong> — {{ disease.highlightText }}</p>
+        </div>
+
+        <div class="hero-cards">
+          <article class="info-card" *ngFor="let card of disease.quickCards; let i = index" [style.--delay]="(i + 1) * 0.1 + 's'">
+            <h4>{{ card.title }}</h4>
+            <p>{{ card.body }}</p>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-gallery">
+      <div class="gallery-img" *ngFor="let image of disease.gallery; let i = index" [class.g1]="i === 0" [class.g2]="i === 1" [class.g3]="i === 2">
+        <img [src]="image.image" [alt]="image.alt" (error)="onImageError($event)" />
+        <div class="gallery-copy">
+          <h3>{{ image.title }}</h3>
+          <p>{{ image.body }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-inner">
+      <div class="section-label">CLINICAL OVERVIEW</div>
+      <h2 class="section-title">Symptoms, Care Plan & Warning Signs</h2>
+
+      <div class="details-grid">
+        <article class="details-card">
+          <h3>Symptoms to Watch</h3>
+          <ul>
+            <li *ngFor="let item of disease.symptoms">{{ item }}</li>
+          </ul>
+        </article>
+
+        <article class="details-card primary-card">
+          <h3>Riva Care Plan</h3>
+          <ul>
+            <li *ngFor="let item of disease.carePlan">{{ item }}</li>
+          </ul>
+        </article>
+
+        <article class="details-card danger-card">
+          <h3>Emergency Warning Signs</h3>
+          <ul>
+            <li *ngFor="let item of disease.warningSigns">{{ item }}</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Tailwind v4 */
+
+@import "tailwindcss";
+
+/* Global font */
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+/*
+ * Mobile App Shell (M1 — Mobile Redesign).
+ *
+ * Shared height tokens for the mobile-only top bar / bottom nav so the
+ * components that render them and this content-offset rule can never drift
+ * apart. Only consulted below 768px — see the media query below.
+ */
+:root {
+    --mobile-topbar-h: 56px;
+    --mobile-bottomnav-h: 60px;
+}
+
+/*
+ * Reserve space so page content is never hidden behind the fixed mobile top
+ * bar / bottom nav, without editing every individual page template.
+ * `app-sidebar ~ main` matches the near-universal "<app-sidebar> followed by
+ * a sibling <main>" layout used across the authenticated app (confirmed via
+ * a repo-wide audit before this rule was added). It intentionally does NOT
+ * use :has() (older-browser compatibility) and is left unlayered on purpose:
+ * Tailwind v4 wraps its own utility classes in CSS cascade layers, and any
+ * plain, unlayered rule in this file automatically outranks a layered
+ * utility class regardless of source order or selector specificity — the
+ * same mechanism the `body { font-family: 'Inter' }` rule above already
+ * relies on. That lets this rule safely override each page's own Tailwind
+ * padding utilities (e.g. p-4, sm:p-8) without needing !important.
+ *
+ * Desktop (768px+) is completely untouched: this rule only applies inside
+ * the max-width: 767px media query, and the mobile shell components it
+ * makes room for are themselves `md:hidden`.
+ */
+@media (max-width: 767px) {
+    app-sidebar ~ main {
+        padding-top: calc(var(--mobile-topbar-h) + env(safe-area-inset-top) + 16px);
+        padding-bottom: calc(var(--mobile-bottomnav-h) + env(safe-area-inset-bottom) + 16px);
+    }
+}

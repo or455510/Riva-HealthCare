@@ -1,0 +1,19 @@
+{
+  "_comment": "Documents the CLI's actual, hardcoded confinement — this file is not read by the code (agent-control/lib/workspace.mjs computes ROOT from its own install location, so it can't be misconfigured to point somewhere else). Kept here for a human to see the boundary without reading source.",
+  "workspaceRoot": "the parent directory of agent-control/ (i.e. rivatest-main/)",
+  "targets": {
+    "root": ".",
+    "backend": "backend",
+    "frontend": "Riva-master"
+  },
+  "neverTouch": [
+    ".env",
+    ".env.*",
+    "**/*secret*",
+    "**/*credential*",
+    "**/*.pem",
+    "**/*.key",
+    "**/id_rsa*"
+  ],
+  "httpServer": "none — CLI only in this phase, see docs/RIVA_SECURITY.md"
+}
